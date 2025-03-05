@@ -16,7 +16,6 @@ export async function POST(request){
             "priceMen": createProduct.priceMen,
             "priceMay": createProduct.priceMay,
             "quantity": createProduct.quantity,
-            "total": createProduct.total,
         }
     })
     console.log(crear);

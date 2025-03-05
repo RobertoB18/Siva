@@ -10,8 +10,7 @@ export default function Page() {
         const quantity = parseInt(e.target.cantidad.value)
         const priceMen = parseFloat(e.target.precioMen.value)
         const priceMay = parseFloat(e.target.precioMay.value)
-        const total = 1;
-        console.log(name, priceMen, priceMay, quantity, total)
+        console.log(name, priceMen, priceMay, quantity)
         try {
             const res = await fetch('/api/productos',{
                 method: 'POST',
@@ -23,6 +22,7 @@ export default function Page() {
             
                 const data = await res.json();
                 console.log(data)
+                
                 router.push("/compras/compra/productos"); 
         } catch (e) {
             console.log("Valio vrg scooby " + e)
