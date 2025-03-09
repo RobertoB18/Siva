@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form"
 import {signIn} from "next-auth/react"
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 export default function login() {
@@ -19,7 +20,7 @@ export default function login() {
       alert(resp.error)
     }
     else {
-      route.push("/");
+      route.push("/dashboard");
     }
     console.log(resp);
   })
@@ -36,6 +37,7 @@ export default function login() {
 
         <button className="bg-black text-white rounded-2xl w-[170px] h-[40px] text-2xl hover:bg-gradient-to-r from-black to-slate-400">Registrar</button>
       </form>
+      <Link href="./register">Registrarse</Link>
     </div>
   )
 }

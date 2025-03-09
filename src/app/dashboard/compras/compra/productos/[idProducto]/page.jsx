@@ -23,7 +23,7 @@ export default function Page() {
                 const data = await res.json();
                 console.log(data)
                 
-                router.push("/compras/compra/productos"); 
+                router.push("/dashboard/compras/compra/productos"); 
         } catch (e) {
             console.log("Valio vrg scooby " + e)
         }
@@ -31,7 +31,7 @@ export default function Page() {
     }
   return (
     <>
-    <Link href="/compras/compra/productos"> <img src="logo"/></Link>
+    <Link href="/dashboard/compras/compra/productos"> <img src="logo"/></Link>
     <div className="h-screen flex flex-col justify-center items-center">
         <form className="bg-slate-800 p-10 w-2/4 h-3/4 rounded-2xl bg-gradient-to-t from-gray-400 to-gray-900"
         onSubmit={onSubmit}>

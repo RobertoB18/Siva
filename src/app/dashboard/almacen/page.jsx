@@ -25,7 +25,7 @@ export default async function page() {
             ))
           }
         </table>
-      <Link href="/compras/compras" className="bg-black text-white h-16 rounded-xl w-auto">Generar Producto</Link>
+      <Link href="/dashboard/compras/compra" className="bg-black text-white h-16 rounded-xl w-auto">Generar Producto</Link>
       </div>
     </>
     

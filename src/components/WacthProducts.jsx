@@ -6,7 +6,7 @@ export default function WacthProducts({producto}) {
   return (
     <tbody>
         <tr className='' >
-            <td className="border border-gray-300 px-4 py-2 cursor-pointer hover:bg-slate-100" onClick={() => {router.push("/compras/compra/productos/"+producto.id)}}>{producto.name}</td>
+            <td className="border border-gray-300 px-4 py-2 cursor-pointer hover:bg-slate-100" onClick={() => {router.push("/dashboard/compras/compra/productos/"+producto.id)}}>{producto.name}</td>
             <td className="border border-gray-300 px-4 py-2">{producto.quantity}</td>
             <td className="border border-gray-300 px-4 py-2">$ {producto.priceMen}</td>
             <td className="border border-gray-300 px-4 py-2">$ {producto.priceMay}</td>
