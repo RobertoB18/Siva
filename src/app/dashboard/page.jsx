@@ -1,7 +1,14 @@
-"use client"
 
-export default function HomePage() {
+import { getServerSession } from "next-auth/next"
+import { authOption } from "../api/auth/[...nextauth]/route"
+
+export default async function HomePage() {
+  const session = await getServerSession(authOption)
+  console.log(session)
   return (
-    <div> Home</div>
+    <div className="flex justify-center flex-col items-center p-10"> 
+      <img src={session.user.image} alt="hola" className=" rounded-full h-36 w-36 "/>
+      <h2 className="text-4xl font-bold text-center">Bienvenido {session.user.name}</h2>
+    </div>
   )
 }

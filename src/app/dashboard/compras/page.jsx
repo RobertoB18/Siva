@@ -28,7 +28,7 @@ export default function Compra() {
         
         <button className="bg-black text-white rounded-2xl w-[100px] h-auto text-2xl">Crear</button>
       </form>
-      <Link href="/compras/compra">Registrar Compra</Link>
+      <Link href="/dashboard/compras/compra">Registrar Compra</Link>
     </div>
   )
 }
