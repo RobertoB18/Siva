@@ -38,6 +38,7 @@ export default function login() {
     }
     console.log(resp);
   })
+
   return (
     <div className="flex justify-center mt-10">
       <form className="shadow-lg shadow-black p-10 w-[500px] h-[650px] rounded-xl" onSubmit={onSubmit}>
@@ -54,7 +55,7 @@ export default function login() {
         <br></br>
         <Link href="./register" className="text-center items-center text-blue-700 hover:text-blue-400">Registrarse</Link>
         <br></br>
-        <button type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="bg-red-500 text-white rounded-2xl w-[170px] h-[40px] text-2xl hover:bg-red-600 mb-5">Iniciar con Google</button>
+        <button type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="bg-red-500 text-white rounded-2xl w-[300px] h-[50px] mt-7 text-2xl hover:bg-red-600 mb-5">Iniciar con Google</button>
       </form>
     </div>
   )
