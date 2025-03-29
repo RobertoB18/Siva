@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function login() {
 
@@ -17,7 +18,7 @@ export default function login() {
 
   if (session) {
     console.log("Usuario autenticado:", session.user);
-    //route.push("/dashboard")
+    route.push("/dashboard");
   } else {
     console.log("No autenticado");
   }

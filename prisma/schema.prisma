@@ -9,15 +9,34 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
 }
+
 model user{
   id Int @id @default(autoincrement())
   userName String
   email String @unique
   password String ?
+  store StoreUser[]
+}
 
+model store{
+  id Int @id @default(autoincrement())
+  name String
+  address String
+  phone String
+  email String
+  user StoreUser[]
+}
+
+model StoreUser{
+  storeId Int
+  userId Int
+  storeRef store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userRef user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, storeId])
 }
 
 model compra{
@@ -33,5 +52,6 @@ model products{
   name String
   priceMen Int
   priceMay Int?
+  mayQuantity Int?
   quantity Int
 }

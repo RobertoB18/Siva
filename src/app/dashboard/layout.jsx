@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex h-screen">
+          <StoreNav />
           <NavBar />
           <main className="w-full overflow-y-auto">
           {children}

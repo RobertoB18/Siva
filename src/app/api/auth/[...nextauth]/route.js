@@ -5,7 +5,7 @@ import bcrypt from "bcrypt"
 import {prisma} from "@/libs/prisma"
 
 
-export const authOption = {
+export const authOptions = {
     providers:[
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -27,10 +27,12 @@ export const authOption = {
                     }
                 })
 
-                if(!userFound) throw new Error("No user foud")
+                if(!userFound) throw new Error("Usuario no encontrado ")
+                
+                if(!userFound.password) throw new Error("Contraseña incorrecta o inicio de sesion con google");
 
                 const match = await bcrypt.compare(credentials.password, userFound.password);
-                if(!match) throw new Error("Password whrow");
+                if(!match) throw new Error("Contraseña incorrecta o inicio de sesion con google");
 
                 return {
                     id: userFound.id,
@@ -89,5 +91,5 @@ export const authOption = {
 
 };
 
-const handler = NextAuth(authOption);
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

@@ -6,6 +6,8 @@ async function getProductos(){
   return await prisma.products.findMany();
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function page() {
   const tableProduct = await getProductos();
   return (
