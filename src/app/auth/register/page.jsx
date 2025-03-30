@@ -94,10 +94,11 @@ export default function Page() {
         >
           Enviar Código
         </button>
-
+        <br />
         {isCodeSent && (
           <>
             <label htmlFor="code">Código de Verificación</label>
+            
             <input 
               id="code" 
               type="text" 
@@ -113,7 +114,7 @@ export default function Page() {
 
         {registerError && <p className="text-red-500 text-lg mb-4">{registerError}</p>}
         <br />
-        <button type="submit" className="bg-black text-white rounded-xl w-[170px] h-[40px] text-2xl mt-2 hover:bg-gradient-to-r from-black to-slate-400">Registrar</button>
+        <button disabled={!isCodeSent} type="submit" className={isCodeSent ? `bg-black text-white rounded-xl w-[170px] h-[40px] text-2xl mt-2 hover:bg-gradient-to-r from-black to-slate-400` : `text-gray-200 rounded-xl w-[170px] h-[40px] text-2xl mt-2 bg-gray-300`}>Registrar</button>
       </form>
     </div>
   );

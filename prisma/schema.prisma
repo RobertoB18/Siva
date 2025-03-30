@@ -28,6 +28,7 @@ model store{
   phone String
   email String
   user StoreUser[]
+  sales    Sale[]
 }
 
 model StoreUser{
@@ -45,6 +46,14 @@ model compra{
   price Int
   quantity Int
   total Int
+}
+
+model Sale {
+  id       Int    @id @default(autoincrement())
+  storeId  Int
+  date     DateTime @default(now())
+  total    Float
+  store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
 model products{

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default function login() {
 
@@ -41,8 +41,8 @@ export default function login() {
   })
 
   return (
-    <div className="flex justify-center mt-10">
-      <form className="shadow-lg shadow-black p-10 w-[500px] h-[650px] rounded-xl" onSubmit={onSubmit}>
+    <div className="flex justify-center items-center h-screen">
+      <form className="shadow-lg shadow-black p-10 w-[500px] h-[550px] rounded-xl" onSubmit={onSubmit}>
         <h2 className="font-bold text-4xl text-center mb-5">Inicio de sesion</h2>
 
         <label htmlFor="email">Email</label>
@@ -50,13 +50,16 @@ export default function login() {
         
         <label htmlFor="password">Password</label>
         <input id="password" type="password" className={`border rounded-md p-2 mb-4 w-full text-black ${errors.password ? "border-red-400 border-[3px]": "border-gray-500"}`} placeholder="*******" {...(register("password", {required: true,} ))}/>
+      
+        <Link href="./register" className="text-center items-center text-blue-700 mb-10 hover:text-blue-400">Registrarse</Link>
         
-        {loginError && <p className="text-red-500 text-lg mb-4">{loginError}</p>}
-        <button className="bg-black text-white rounded-2xl w-[170px] h-[40px] text-2xl hover:bg-gradient-to-r from-black to-slate-400 mb-5">Registrar</button>
-        <br></br>
-        <Link href="./register" className="text-center items-center text-blue-700 hover:text-blue-400">Registrarse</Link>
-        <br></br>
-        <button type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="bg-red-500 text-white rounded-2xl w-[300px] h-[50px] mt-7 text-2xl hover:bg-red-600 mb-5">Iniciar con Google</button>
+        {loginError && <p className="text-red-500 text-lg mt-4">{loginError}</p>}
+        <button className="bg-black text-white rounded-2xl w-full h-[40px] text-2xl hover:bg-gradient-to-r from-black to-slate-400 my-4">Iniciar sesion</button>
+
+        <button type="button" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="bg-slate-200 font-bold rounded-2xl w-full h-[40px] mt-5 text-2xl hover:bg-slate-300 mb-5 flex items-center justify-center gap-2">
+          <Image src={"/google.png"} width={30} height={30} alt="Google Logo" />
+          <span>Iniciar con Google</span>
+        </button>
       </form>
     </div>
   )
