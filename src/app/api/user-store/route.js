@@ -30,7 +30,7 @@ export async function GET() {
         }
       }
     });
-    console.log(userStores);
+    //console.log(userStores);
 
     if (!userStores) {
       return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
@@ -46,4 +46,34 @@ export async function GET() {
     console.error("Error al obtener tiendas del usuario:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
+}
+
+
+export async function POST(request, {params}){
+  const newStore = await request.json();
+  console.log(newStore);
+  const session = await getServerSession(authOptions);
+  console.log("Este es el ide de la tienda "+ session.user.email);
+  try {
+      const crearStore = await prisma.store.create({
+          data: {
+              "name": newStore.name,
+              "email": newStore.email,
+              "phone": newStore.phone,
+              "address": newStore.address,
+          }
+      })
+      console.log(crearStore);
+      const storeRef = await prisma.StoreUser.create({
+          data:{
+              "storeId": crearStore.id,
+              "userId": session.user.id,
+          }
+      })
+      console.log(storeRef);
+      return NextResponse.json(crearStore);
+  } catch (error) {
+      console.log("Error al crear la tienda "+ error);
+  }
+  
 }
