@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useStore } from '@/Context/newStoreContext'
+import toast, { Toaster } from "react-hot-toast";
 
 export default function page() {
 
@@ -36,14 +37,16 @@ export default function page() {
   }, []); 
 
   const onSubmit = handleSubmit(async (e) => {
-    
+    const toastId = toast.loading("Creando negocio...");
+
     try {
       const newStore = {name, email, phone, address};
       await addStore(newStore);
+      toast.success("Registro exitoso", { id: toastId });
       router.push("/dashboard")
 
     } catch (error) {
-      console.error("Error al crear la tienda:", error)
+      toast.success("Error al crear el negocio", { id: toastId });
     }
   })
   return (
@@ -65,6 +68,7 @@ export default function page() {
         
         <button type='submit' className='bg-slate-900 text-white rounded-lg p-2'>Crear</button>
       </form>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   )
   /*<label htmlFor="logo">Logo de la tienda</label>

@@ -20,11 +20,11 @@ export default function NavBar() {
       <aside className="sticky h-screen w-[190px] bg-black top-0 left-0">
         <ul className="px-2 items-center flex-col text-xl">
           {[
-            { name: "Home", path: "/dashboard/store/"+selectedStore },
-            { name: "Compra", path: "/dashboard/store/"+selectedStore + "/Compra"  },
-            { name: "Venta", path: "/dashboard/store/"+selectedStore +"/venta" },
-            { name: "Almacen", path: "/dashboard/store/"+selectedStore + "/almacen" },
-            { name: "Contabilidad", path: "/dashboard/store/"+selectedStore + "/contabilidad" },
+            { name: "Home", path: "/dashboard/store/"+selectedStore.id },
+            { name: "Compra", path: "/dashboard/store/"+selectedStore.id + "/Compra"  },
+            { name: "Venta", path: "/dashboard/store/"+selectedStore.id +"/venta" },
+            { name: "Almacen", path: "/dashboard/store/"+selectedStore.id + "/almacen" },
+            { name: "Contabilidad", path: "/dashboard/store/"+selectedStore.id + "/contabilidad" },
           ].map((item) => (
             <li
               key={item.path}

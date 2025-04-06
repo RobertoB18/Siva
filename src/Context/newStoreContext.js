@@ -41,7 +41,7 @@ export function StoreProvider({ children }) {
       setStores((prevStores) => [...prevStores, createdStore]);
 
       // Seleccionar la nueva tienda automáticamente
-      setSelectedStore(createdStore);
+      setSelectedStore(null); // Reiniciar la tienda seleccionada
       
     } catch (error) {
       console.error("Error al agregar la tienda:", error);

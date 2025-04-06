@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function login() {
 
@@ -29,13 +30,11 @@ export default function login() {
       password: data.password,
       redirect: false,
     })
+
     console.log(resp);
     if(!resp.ok){
+      toast.error("Error al iniciar sesion")
       setLoginError(resp.error)
-    }
-    else {
-      setLoginError(null);
-      route.push("/dashboard");
     }
     console.log(resp);
   })
@@ -61,6 +60,7 @@ export default function login() {
           <span>Iniciar con Google</span>
         </button>
       </form>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   )
 }

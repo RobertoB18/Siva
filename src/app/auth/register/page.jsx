@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { sendVerificationEmail } from "@/app/Hooks/sendEmail";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Page() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -16,20 +17,24 @@ export default function Page() {
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-\/\\])[A-Za-z\d@$!%*?&.\-\/\\]{8,}$/;
 
-  // 📌 Función para enviar código al correo
   const handleSendCode = async (email, userName) => {
-    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString(); // Código de 6 dígitos
+    const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
-    
     const realCode = generatedCode;
-    console.log(realCode);
-    try {
-      await sendVerificationEmail(email,userName, realCode);
+
+    toast.promise(
+      sendVerificationEmail(email, userName, realCode),
+      {
+        loading: "Enviando código, Esto puede tardar un poco...",
+        success: "Código enviado exitosamente",
+        error: "Error al enviar el código. Intente de nuevo",
+      }
+    ).then(() => {
       setIsCodeSent(true);
-    } catch (error) {
+    }).catch((error) => {
       console.error("Error enviando código:", error);
       setRegisterError("No se pudo enviar el código. Intente de nuevo.");
-    }
+    });
   };
 
   
@@ -44,6 +49,7 @@ export default function Page() {
     if (userInputCode !== verificationCode) {
       return setRegisterError("El código ingresado es incorrecto.");
     }
+    const toastId = toast.loading("Registrando usuario...");
 
     const resp = await fetch("/api/auth/register", {
       method: "POST",
@@ -53,10 +59,13 @@ export default function Page() {
 
     if (resp.ok) {
       setRegisterError(null);
+      toast.success("Registro exitoso", { id: toastId });
       router.push("/auth/login");
     } else if (resp.status === 400) {
+      toast.error("Problema en el registro", { id: toastId });
       setRegisterError("El correo ya está registrado.");
     } else {
+      toast.error("Problema en el registro", { id: toastId });
       setRegisterError("Hubo un problema en el registro. Intente más tarde.");
     }
   });
@@ -116,6 +125,7 @@ export default function Page() {
         <br />
         <button disabled={!isCodeSent} type="submit" className={isCodeSent ? `bg-black text-white rounded-xl w-[170px] h-[40px] text-2xl mt-2 hover:bg-gradient-to-r from-black to-slate-400` : `text-gray-200 rounded-xl w-[170px] h-[40px] text-2xl mt-2 bg-gray-300`}>Registrar</button>
       </form>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 }
