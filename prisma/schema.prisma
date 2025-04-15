@@ -29,6 +29,7 @@ model store{
   email String
   user StoreUser[]
   sales    Sale[]
+  products products[]
 }
 
 model StoreUser{
@@ -58,9 +59,15 @@ model Sale {
 
 model products{
   id Int @id @default(autoincrement())
+  storeId Int
+
   name String
+  priceCost Int
   priceMen Int
+  stock Int
   priceMay Int?
   mayQuantity Int?
-  quantity Int
+  store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
+
+

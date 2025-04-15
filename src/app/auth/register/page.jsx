@@ -45,7 +45,7 @@ export default function Page() {
       setPasswordError(null);
     }
 
-    // alidar que el código ingresado sea correcto antes de registrar al usuario
+    // Validar que el código ingresado sea correcto antes de registrar al usuario
     if (userInputCode !== verificationCode) {
       return setRegisterError("El código ingresado es incorrecto.");
     }

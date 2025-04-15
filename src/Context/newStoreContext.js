@@ -13,9 +13,14 @@ export function StoreProvider({ children }) {
     try {
       const response = await fetch("/api/user-store");
       if (!response.ok) throw new Error("Error al obtener tiendas");
-
+      
       const data = await response.json();
       setStores(data);
+
+      const savedStoreId = localStorage.getItem("selectedStoreId");
+      if (savedStoreId) {
+        setSelectedStore(savedStoreId); 
+      }
       
     } catch (error) {
       console.error(error);
@@ -40,7 +45,7 @@ export function StoreProvider({ children }) {
       // Agregar la nueva tienda al estado
       setStores((prevStores) => [...prevStores, createdStore]);
 
-      // Seleccionar la nueva tienda automáticamente
+      // Regresa al menu principal
       setSelectedStore(null); // Reiniciar la tienda seleccionada
       
     } catch (error) {
@@ -52,6 +57,11 @@ export function StoreProvider({ children }) {
   function selectStore(store) {
     console.log("Tienda seleccionada:", store);
     setSelectedStore(store);
+    if (store) {
+      localStorage.setItem("selectedStoreId", store);
+    } else {
+      localStorage.removeItem("selectedStoreId");
+    }
   }
 
   useEffect(() => {

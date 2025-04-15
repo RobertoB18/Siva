@@ -2,12 +2,15 @@
 import React from 'react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useStore } from "@/Context/newStoreContext";
 
 export default function Cargando() {
-
+  const {selectStore } = useStore();
   const {idStore} = useParams();
   const [store, setStore] = useState([]);
   useEffect(() => {async function fetchStores(){
+    const toastId = toast.loading("Cargando tienda...");
     try {
       const response = await fetch("/api/" + idStore);
       console.log(response);
@@ -15,14 +18,18 @@ export default function Cargando() {
       if (!response.ok) throw new Error("Error al obtener tienda");
       
       const data = await response.json();
+      if(!data) throw new Error("No se encontró la tienda");
       setStore(data);
-      console.log(data);
+      toast.success("Tienda cargada", { id: toastId });
     } catch (error) {
+      selectStore(null);
+      toast.error("Error al cargar tienda o no perteneces a esta", { id: toastId });
       console.error(error);
     }
   }
     fetchStores();
   }, []);
+  
   return (
     <div className="flex flex-col justify-center items-center h-2/4">
       <h1 className='text-4xl'>Bienvenido a {store.name}</h1>
@@ -30,6 +37,7 @@ export default function Cargando() {
       <p className='text-2xl'>Direccion: {store.address}</p>
       <p className='text-2xl'>Correo: {store.email}</p>
       <p className='text-2xl'>logo:</p>
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   )
 }

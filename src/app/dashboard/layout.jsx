@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-        <div className="flex h-screen">
+    <>
+      
+      <div className="flex h-screen">
           <StoreProvider>
+            
             <StoreNav />
             <NavBar />
             <main className="w-full overflow-y-auto">
@@ -26,5 +29,7 @@ export default function RootLayout({ children }) {
             </main>
           </StoreProvider>
         </div>
+    </>
+        
   );
 }
