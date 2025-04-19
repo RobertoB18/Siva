@@ -4,10 +4,9 @@ import Link from 'next/link';
 import Image from "next/image";
 
 export default function WacthProducts({producto}) {
-    const router = new useRouter;
   return (
     <tbody>
-        <tr className='' >
+        <tr className={`${producto.status? "bg-white": "bg-slate-200"}`} >
             <td className="border border-gray-300 px-4 py-2 ">{producto.name}</td>
             <td className="border border-gray-300 px-4 py-2 ">$ {producto.priceCost}</td>
             <td className="border border-gray-300 px-4 py-2">$ {producto.priceMen}</td>

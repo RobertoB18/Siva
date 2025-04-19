@@ -60,13 +60,18 @@ model Sale {
 model products{
   id Int @id @default(autoincrement())
   storeId Int
-
   name String
   priceCost Int
   priceMen Int
+  stockMin Int
   stock Int
+  unities String
+  description String
+  status Boolean
+  codesat Int
   priceMay Int?
   mayQuantity Int?
+  codeBar Int?
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
