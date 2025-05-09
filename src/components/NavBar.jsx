@@ -24,7 +24,7 @@ export default function NavBar() {
           {[
             { name: "Home", path: "/dashboard/store/"+selectedStore },
             { name: "Compra", path: "/dashboard/store/"+selectedStore + "/Compra"  },
-            { name: "Venta", path: "/dashboard/store/"+selectedStore +"/venta" },
+            { name: "Venta", path: "/dashboard/store/"+selectedStore +"/ventas" },
             { name: "Almacen", path: "/dashboard/store/"+selectedStore + "/almacen" },
             { name: "Contabilidad", path: "/dashboard/store/"+selectedStore + "/contabilidad" },
           ].map((item) => (

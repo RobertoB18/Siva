@@ -1,0 +1,66 @@
+"use client"
+import Link from "next/link"
+import WatchSales from "@/components/WatchSales";
+import { useStore } from "@/Context/newStoreContext";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
+export const dynamic = "force-dynamic";
+
+export default function Ventas() {
+
+  const { selectedStore } = useStore();
+  const [data, setData] = useState([])
+  const [search, setSearch] = useState("")
+
+  useEffect(() => {
+    const toastId = toast.loading("Cargando...")
+    const productos = async () => {
+      try {
+        const resp = await fetch(`/api/sales?idStore=${selectedStore}`)
+        const data = await resp.json()
+        setData(data)
+        console.log(data)
+        toast.success("Productos cargados", { id: toastId })
+      } catch (error) {
+        toast.error("Error al cargar los productos", { id: toastId })
+      }
+    };
+    productos()
+  }, [selectedStore])  
+
+  const filteredData = data.filter(venta =>{
+    if(search === "") return venta
+    return venta.clientes?.name?.toLowerCase().includes(search.toLowerCase())
+  }
+  );
+
+
+  return (
+    <div>
+      <div className="flex flex-col items-start ms-16 mt-6 w-3/4 h-auto">
+        <input type="text" placeholder="Buscar venta" className="border border-gray-300 w-full rounded-lg p-2" onChange={(e) => setSearch(e.target.value)} />
+        <div className="mt-2 flex gap-2">
+          <Link href="./ventas/newVenta " className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Nueva Venta</Link>
+        </div>
+      </div>
+      <div className="h-screen w-3/4 flex flex-row ms-16 mt-5">
+        <table className="table-auto border-collapse border border-gray-300 w-full h-7">
+          <thead>
+            <tr className="bg-black text-white">
+              <th className="border border-gray-300 px-4 py-2">Id</th>
+              <th className="border border-gray-300 px-4 py-2">Fecha</th>
+              <th className="border border-gray-300 px-4 py-2">Total</th>
+              <th className="border border-gray-300 px-4 py-2">Cliente</th>
+              <th className="border border-gray-300 px-4 py-2">Opciones</th>
+            </tr>
+          </thead>
+          {filteredData.map(ventas => (
+              <WatchSales sale={ventas} key={ventas.id}/>
+            ))
+          }
+        </table>
+      </div>
+    </div>
+  )
+}

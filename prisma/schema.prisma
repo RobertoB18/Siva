@@ -27,7 +27,9 @@ model store{
   address String
   phone String
   email String
+  
   user StoreUser[]
+  clientes  clientes[]
   sales    Sale[]
   products products[]
 }
@@ -52,11 +54,26 @@ model compra{
 model Sale {
   id       Int    @id @default(autoincrement())
   storeId  Int
+  clienteId Int ?  // cliente id
+  productos Json
   date     DateTime @default(now())
   total    Float
+  
+  clientes clientes? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
+model clientes{
+  id Int @id @default(autoincrement())
+  name String
+  phone String
+  email String
+  address String
+  storeId  Int
+
+  store    store   @relation(fields: [storeId], references: [id])
+  sale    Sale[]
+}
 model products{
   id Int @id @default(autoincrement())
   storeId Int
@@ -71,7 +88,7 @@ model products{
   codesat Int
   priceMay Int?
   mayQuantity Int?
-  codeBar Int?
+  codeBar Int? 
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 

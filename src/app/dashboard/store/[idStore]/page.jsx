@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useStore } from "@/Context/newStoreContext";
 
+
 export default function Cargando() {
   const {selectStore } = useStore();
   const {idStore} = useParams();
   const [store, setStore] = useState([]);
-  useEffect(() => {async function fetchStores(){
+
+  useEffect(() => {async function fetchStores(){1
     const toastId = toast.loading("Cargando tienda...");
     try {
       const response = await fetch("/api/" + idStore);

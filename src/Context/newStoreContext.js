@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
+import { useSale } from "@/app/Hooks/useSale";
 
 const StoreContext = createContext();
 
@@ -7,6 +8,8 @@ export function StoreProvider({ children }) {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null); // Nueva tienda seleccionada
+
+  const {clearCart} = useSale()
 
   // Obtener las tiendas del usuario
   async function fetchStores() {
@@ -57,8 +60,10 @@ export function StoreProvider({ children }) {
   function selectStore(store) {
     console.log("Tienda seleccionada:", store);
     setSelectedStore(store);
+    clearCart() // Limpiar el carrito al cambiar de tienda
     if (store) {
       localStorage.setItem("selectedStoreId", store);
+
     } else {
       localStorage.removeItem("selectedStoreId");
     }
@@ -67,6 +72,7 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     fetchStores();
   }, []);
+
 
   return (
     <StoreContext.Provider value={{ stores, loading, selectedStore, selectStore, addStore }}>

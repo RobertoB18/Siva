@@ -7,7 +7,6 @@ export async function GET(request) {
     console.log(request.url);
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
-    console.log(query);
 
     try {
         const searchResult = await facturapi.catalogs.searchUnits({
