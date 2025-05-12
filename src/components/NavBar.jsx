@@ -23,7 +23,7 @@ export default function NavBar() {
         <ul className="px-2 items-center flex-col text-xl">
           {[
             { name: "Home", path: "/dashboard/store/"+selectedStore },
-            { name: "Compra", path: "/dashboard/store/"+selectedStore + "/Compra"  },
+            { name: "Compra", path: "/dashboard/store/"+selectedStore + "/compras"  },
             { name: "Venta", path: "/dashboard/store/"+selectedStore +"/ventas" },
             { name: "Almacen", path: "/dashboard/store/"+selectedStore + "/almacen" },
             { name: "Contabilidad", path: "/dashboard/store/"+selectedStore + "/contabilidad" },

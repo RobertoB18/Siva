@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo} from "react"
 
-export function useSale() {
+export function useBuys() {
     
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const localStorageCart = localStorage.getItem("cart");
+            const localStorageCart = localStorage.getItem("buys");
             if (localStorageCart) {
             setCart(JSON.parse(localStorageCart));
             }
@@ -15,23 +15,24 @@ export function useSale() {
     
     useEffect(()=>{
         if (typeof window !== "undefined") {
-            localStorage.setItem("cart", JSON.stringify(cart));
+            localStorage.setItem("buys", JSON.stringify(cart));
         }
     }, [cart])
 
-    function addtoSale(item){
+    function addtoBuy(item){
         const itemexist = cart.findIndex(product => product.id === item.id)
         //console.log("item", item)
         if(itemexist >= 0 ){
             const updateCart = [...cart]
             updateCart[itemexist].quantity++
             console.log(updateCart[itemexist].quantity)
-            updateCart[itemexist].total = getUnitPrice(updateCart[itemexist]) * (updateCart[itemexist].quantity)
-            updateCart[itemexist].price = getUnitPrice(updateCart[itemexist])
+            updateCart[itemexist].total = (updateCart[itemexist].priceCost) * (updateCart[itemexist].quantity)
             setCart(updateCart)
         }else{
-            const total = item.priceMen
+            const total = item.priceCost
+            const priceIva = Number(item.priceCost) / 1.16
             item.total = total;
+            item.priceIva = priceIva.toFixed(2);
             item.quantity = 1;
             item.price = item.priceMen
             setCart([...cart ,item])
@@ -40,6 +41,7 @@ export function useSale() {
     function removeFromCart(id){
         setCart(prevCart => prevCart.filter(item => item.id !== id))
     }
+
     function updateCartQuantity(id, quantity) {
         console.log("id", id)
         const updatedCart = cart.map(item => {
@@ -61,9 +63,8 @@ export function useSale() {
             let finalQuantity = Number(quantity);
         
             if (isNaN(finalQuantity) || finalQuantity < 1) finalQuantity = 1;
-            if (finalQuantity > item.stock) finalQuantity = item.stock;
             
-            const total = getUnitPrice(item) * (finalQuantity);
+            const total = item.priceCost * (finalQuantity);
             return {
                 ...item,
                 total: total,
@@ -87,10 +88,11 @@ export function useSale() {
     function clearCart(){
         setCart([])
     }
+    const totalIva = useMemo(() => cart.reduce((total, item) => total + (item.priceIva * item.quantity), 0).toFixed(2), [cart])
     const isEmpty = useMemo( ()=> cart.length ===0, [cart]) 
     const totalCart = useMemo(() => cart.reduce((total, item) => total + item.total,0), [cart])
 
-    async function updateSale(storeId, clienteId, sale){
+    async function updateBuy(storeId, clienteId, buy){
         try {
             const payload = {
                 storeId: Number(storeId),
@@ -100,7 +102,7 @@ export function useSale() {
             }
 
             console.log(payload)
-            const response = await fetch("/api/sales/"+sale, {
+            const response = await fetch("/api/sales/"+buy, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -121,16 +123,16 @@ export function useSale() {
             }
         }
     }
-    async function finishSale(storeId, clienteId){
+    async function finishBuy(storeId, providerId){
         try {
             const payload = {
                 storeId: Number(storeId),
-                cliente: clienteId,
+                providerId: providerId,
                 total: Number(totalCart),
                 productos: cart 
             }
 
-            const response = await fetch("/api/sales", {
+            const response = await fetch("/api/buys", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -138,9 +140,7 @@ export function useSale() {
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) {
-                throw new Error("Error al crear la venta")
-            }
+            if (!response.ok) throw new Error("Error al registar la compra")
 
             return {
                 success: true
@@ -156,14 +156,15 @@ export function useSale() {
     return {
         cart,
         setCart,
-        updateSale,
+        updateBuy,
         validateQuantity,
         updateCartQuantity,
         clearCart,
         removeFromCart,
-        addtoSale,
-        finishSale,
+        addtoBuy,
+        finishBuy,
         isEmpty,
-        totalCart
+        totalCart,
+        totalIva
     }
 }

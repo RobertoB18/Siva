@@ -32,6 +32,8 @@ model store{
   clientes  clientes[]
   sales    Sale[]
   products products[]
+  buys     buy[]
+  provider Provider[]
 }
 
 model StoreUser{
@@ -74,6 +76,7 @@ model clientes{
   store    store   @relation(fields: [storeId], references: [id])
   sale    Sale[]
 }
+
 model products{
   id Int @id @default(autoincrement())
   storeId Int
@@ -92,4 +95,31 @@ model products{
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
+model buy{
+  id Int @id @default(autoincrement())
+  storeId Int
+  providerId Int?
+  productos Json
+  date     DateTime @default(now())
+  codeFactura String
+  total    Float
+
+  provider Provider? @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model Provider{
+  id Int @id @default(autoincrement())
+  name String
+  phone String
+  email String
+  address String
+  rfc String
+  storeId Int
+  codeProvider String
+  status Boolean
+
+  store store @relation(fields: [storeId], references: [id])
+  buys buy[]
+}
 
