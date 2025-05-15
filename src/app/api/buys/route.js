@@ -38,14 +38,23 @@ export async function POST(request) {
                 providerId: createBuy.providerId,
                 total: createBuy.total,
                 productos: createBuy.productos,
-                codeFactura: "1",
+                codeFactura: createBuy.codeFactura,
             }
         });
 
         for (const producto of createBuy.productos) {
+          const products = await prisma.products.findMany({
+            where: {
+                id: producto.id
+            }
+          });
+          const estado = true;
+          const stockTotal = products.stock + producto.quantity;
+          if(stockTotal < products.stockMin) estado = false;
           await prisma.products.update({
             where: { id: producto.id },
             data: {
+              status: estado,
               stock: {
                 increment: producto.quantity // Restar la cantidad vendida
               }

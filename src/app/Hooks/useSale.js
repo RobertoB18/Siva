@@ -2,16 +2,13 @@ import { useState, useEffect, useMemo} from "react"
 
 export function useSale() {
     
-    useEffect(() => {
+    const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
             const localStorageCart = localStorage.getItem("cart");
-            if (localStorageCart) {
-            setCart(JSON.parse(localStorageCart));
-            }
+            return localStorageCart ? JSON.parse(localStorageCart) : [];
         }
-    }, []);
-
-    const[cart, setCart] = useState([]);
+        return [];
+    });
     
     useEffect(()=>{
         if (typeof window !== "undefined") {

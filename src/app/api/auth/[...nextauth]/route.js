@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcrypt"
+import encryptOption from "@/app/Hooks/encryptOption.js"
 import {prisma} from "@/libs/prisma"
 
+const [encryptPassword,decryptPassword] = encryptOption();
 
 export const authOptions = {
     providers:[
@@ -30,10 +31,13 @@ export const authOptions = {
                 if(!userFound) throw new Error("Usuario no encontrado ")
                 
                 if(!userFound.password) throw new Error("Contraseña incorrecta o inicio de sesion con google");
+                console.log("hola");
+                
+                const match = await decryptPassword(userFound.password);
+                console.log(match);
 
-                const match = await bcrypt.compare(credentials.password, userFound.password);
-                if(!match) throw new Error("Contraseña incorrecta o inicio de sesion con google");
-
+                if(credentials.password !== match) throw new Error("Contraseña incorrecta o inicio de sesion con google");
+                
                 return {
                     id: userFound.id,
                     email: userFound.email,

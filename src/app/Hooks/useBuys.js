@@ -2,16 +2,13 @@ import { useState, useEffect, useMemo} from "react"
 
 export function useBuys() {
     
-    useEffect(() => {
+    const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
             const localStorageCart = localStorage.getItem("buys");
-            if (localStorageCart) {
-            setCart(JSON.parse(localStorageCart));
-            }
+            return localStorageCart ? JSON.parse(localStorageCart) : [];
         }
-    }, []);
-
-    const[cart, setCart] = useState([]);
+        return [];
+    });
     
     useEffect(()=>{
         if (typeof window !== "undefined") {
@@ -123,13 +120,14 @@ export function useBuys() {
             }
         }
     }
-    async function finishBuy(storeId, providerId){
+    async function finishBuy(storeId, providerId, code){
         try {
             const payload = {
                 storeId: Number(storeId),
                 providerId: providerId,
                 total: Number(totalCart),
-                productos: cart 
+                productos: cart,
+                codeFactura: code
             }
 
             const response = await fetch("/api/buys", {

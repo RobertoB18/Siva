@@ -1,9 +1,11 @@
 import { prisma } from "@/libs/prisma";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt"
+import encryptOptions from "@/app/Hooks/encryptOption.js";
 
 export async function POST(request){
     try {
+        const [encryptPassword, decryptPassword] = encryptOptions();
+
         const data = await request.json();
         const searchUser = await prisma.user.findUnique({
             where:{
@@ -12,15 +14,18 @@ export async function POST(request){
         })
         
         if(searchUser){
-            return NextResponse.json({message:"Email already exist"}, {status:400})
+            return NextResponse.json({message:"Correo ya registrado"}, {status:400})
         }
     
-        const passwordHash = await bcrypt.hash(data.password, 10);
+        const passwordEncrypt = await encryptPassword(data.password);
+        console.log("Hola");
+        console.log("Password Hash: ", passwordEncrypt);
+        console.log("Password Decrypted: ", decryptPassword(passwordEncrypt));
         const newUser = await prisma.user.create({
             data: {
                 "userName": data.userName,
                 "email": data.email,
-                "password": passwordHash,
+                "password": passwordEncrypt,
             }
         })
         const {password: _, ...user} = newUser

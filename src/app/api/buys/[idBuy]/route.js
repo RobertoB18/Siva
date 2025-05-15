@@ -15,25 +15,6 @@ export async function GET(request, {params}){
     }
 }
 
-/*export async function PUT(request, {params}){
-    const dataUpdate = await request.json();
-    console.log(dataUpdate);
-    console.log("ID "+params.idBuy);
-
-    const buyUpdate = await prisma.buy.update({
-        where: {
-            id: Number(params.idBuy)
-        },
-        data: {
-            storeId: dataUpdate.storeId,
-            proveedorId: dataUpdate.proveedor,
-            total: dataUpdate.total,
-            productos: dataUpdate.productos
-        }
-    });
-    return NextResponse.json(buyUpdate);
-}*/
-
 export async function DELETE(request, {params}){
     try {
         const getBuy = await prisma.buy.findUnique({
@@ -41,14 +22,18 @@ export async function DELETE(request, {params}){
                 id: Number(params.idBuy)
             }
         });
-
-        const deleteBuy = await prisma.buy.delete({
-            where: {
-                id: Number(params.idBuy)
-            }
-        });
-
+        
         for (const producto of getBuy.productos) {
+            const getProduct = await prisma.products.findUnique({
+                where: {
+                    id: producto.id
+                }
+            }); 
+            console.log(getProduct);
+
+            if(getProduct.stock < producto.quantity){
+                return NextResponse.json({error: "No hay suficiente stock para eliminar la compra"}, {status:400});
+            }
             await prisma.products.update({
                 where: { id: producto.id},
                 data: {
@@ -58,6 +43,11 @@ export async function DELETE(request, {params}){
                 }
             });
         }
+        const deleteBuy = await prisma.buy.delete({
+            where: {
+                id: Number(params.idBuy)
+            }
+        });
         return NextResponse.json(deleteBuy);
     } catch (error) {
         return NextResponse.json({error: "Error al eliminar la compra"}, {status:500});

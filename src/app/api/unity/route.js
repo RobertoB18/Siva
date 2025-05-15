@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
 import Facturapi from "facturapi";
 
-const facturapi = new Facturapi("sk_test_AKEM98JwP6ebLZWqRZVdwBOd3PRgr7loQ0OdyBxm4Y");
+const facturapi = new Facturapi(process.env.FACTUAPI_KEY);
 
 export async function GET(request) {
-    console.log(request.url);
-    const { searchParams } = new URL(request.url);
-    const query = searchParams.get("q");
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get("q");
 
-    try {
-        const searchResult = await facturapi.catalogs.searchUnits({
-          q: String(query),
-        });
+  try {
+      const searchResult = await facturapi.catalogs.searchUnits({
+        q: String(query),
+      });
 
-        return NextResponse.json(searchResult);
-      } catch (error) {
-        console.log("Error en la respuesta de la API:", error.message);
-        return NextResponse.json("Error");
-      }
+      return NextResponse.json(searchResult);
+    } catch (error) {
+      console.log("Error en la respuesta de la API:", error.message);
+      return NextResponse.json("Error");
+    }
 }

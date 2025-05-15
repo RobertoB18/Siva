@@ -48,7 +48,8 @@ export default function NewProduct() {
           if (unidad) {
             setSelectedUnidad({
               label: `${unidad.description} (${unidad.key})`,
-              value: unidad.key
+              value: unidad.key,
+              unidad: unidad.description
             });
           }
           toast.success("Producto cargado", { id: toastId });
@@ -77,7 +78,8 @@ export default function NewProduct() {
 
       return data.data.map((item) => ({
         label: `${item.description} (${item.key})`,
-        value: item.key
+        value: item.key,
+        unidad: item.description
       }));
 
     } catch (error) {
@@ -104,7 +106,8 @@ export default function NewProduct() {
       priceMen: Number(data.priceMen),
       stockMin: Number(data.stockMin),
       stock: Number(data.stock),
-      unities: selectedUnidad.value,
+      unity: selectedUnidad.unidad,
+      unityCode: selectedUnidad.value,
       description: data.description,
       status: data.status,
       codesat: Number(data.codesat),
@@ -132,7 +135,7 @@ export default function NewProduct() {
         toast.success("Producto creado", { id: toastId });
       }
       router.refresh();
-      router.push("../almacen");
+      router.push("../compras/newCompra");
     } catch (e) {
         toast.error("Error al guardar el producto", { id: toastId });
         console.error("Error:", e);
@@ -141,7 +144,7 @@ export default function NewProduct() {
 
   return (
     <>
-      <Link href="../almacen" className=''>
+      <Link href="../compras/newCompra" className=''>
         <img src="/volver.png" width={30} height={30} alt="Regresar" />
       </Link>
       <div className="h-screen flex flex-col">

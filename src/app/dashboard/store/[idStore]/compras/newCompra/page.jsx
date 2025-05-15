@@ -13,9 +13,12 @@ export default function page() {
   const {clearCart, addtoBuy, updateCartQuantity, removeFromCart, validateQuantity, finishBuy, totalIva, cart,setCart, totalCart, updateBuy} = useBuys()
   
   const router = useRouter()
+  const [showConfirm, setShowConfirm] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [providers, setProviders] = useState(null)
+  const [code, setCode] = useState("")
   const [providerSelected, setProviderSelected] = useState(null)
+  const [valido, setValido] = useState(true)
   const params = useParams();
 
   useEffect(() => {
@@ -25,7 +28,12 @@ export default function page() {
         .then(res => res.json())
         .then(async data => {
           setCart(data.productos);
-
+          const hoy = new Date();
+          const fechaVenta = new Date(data.date);
+          const mismoMes = fechaVenta.getMonth() === hoy.getMonth() && fechaVenta.getFullYear() === hoy.getFullYear();
+          if(!mismoMes){
+            setValido(false)
+          }
           if (providers) {
             const providerObj = providers.find(c => c.id === data.providerId);
             console.log(providerObj)
@@ -63,7 +71,7 @@ export default function page() {
           id: item.id,
           name: item.name,
           priceCost: item.priceCost,
-          unity: item.unities,
+          unity: item.unity,
           stock: item.stock,
         }))
       })
@@ -82,14 +90,16 @@ export default function page() {
         const result = await fetch(`/api/buys/${params.idCompra}`, {
           method: "DELETE",
         })
-        if(!result.ok) return toast.error("Error al eliminar la compra", { id: toastId });
+        const data = await result.json()
+
+        if(data.error) return toast.error(data.error, { id: toastId });
       } 
       clearCart()
       toast.success("Compra eliminada", { id: toastId })
       router.push("../compras")
     } catch (error) {
       console.log(error)
-      toast.error("Error al eliminar la compra", { id: toastId })
+      toast.error(error.message, { id: toastId })
     }
   }
 
@@ -111,7 +121,7 @@ export default function page() {
         if(!providerSelected) return toast.error("Seleccione un proveedor", { id: toastId })
 
         const providerId = Number(providerSelected.id)
-        const result = await finishBuy(selectedStore, providerId)
+        const result = await finishBuy(selectedStore, providerId, code)
       
         if(!result.success) return toast.error("Error al registrar la compra", { id: toastId });
         toast.success("Compra finalizada", { id: toastId })
@@ -141,7 +151,12 @@ export default function page() {
         <h1 className='text-3xl font-bold'>Registrar Compra de mercancia</h1>
         <div className='mt-5 flex flex-col'>
           <h2 className='text-xl font-bold'>Selecciona el producto</h2>
-          <AsyncSelect className='w-4/5' onChange={addtoBuy} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>
+          <div className='flex justify-between w-1/2'>
+            <AsyncSelect className='w-1/2' isDisabled={params.idCompra} onChange={addtoBuy} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>
+            {!params.idCompra &&
+              <Link href="../almacen/newProduct" className="flex items-center justify-center bg-green-600 text-white h-10 w-[200px] text-lg font-bold rounded-lg hover:bg-slate-600">+ Añadir producto</Link>
+            }
+             </div>
         </div>
         <div className='mt-6 flex'>
           <button className='bg-slate-700 hover:bg-slate-500 text-xl text-white rounded-md h-8' onClick={() => setIsOpen(true)}>Selecciona un proveedor</button>
@@ -157,6 +172,7 @@ export default function page() {
           <thead>
             <tr className="bg-black text-white">
                 <th className="border border-gray-300 px-4 py-2">Cantidad</th>
+                <th className="border border-gray-300 px-4 py-2">U. Medida</th>
                 <th className="border border-gray-300 px-4 py-2">Nombre</th>
                 <th className="border border-gray-300 px-4 py-2">Stock Actual</th>
                 <th className="border border-gray-300 px-4 py-2">Precio S/IVA</th>
@@ -170,13 +186,18 @@ export default function page() {
                 <tr key={item.id}>
                   
                   <td className="border border-gray-300 px-4 py-2 text-center">
-                    <input 
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => updateCartQuantity(item.id, e.target.value)}
-                      onBlur={(e) => validateQuantity(item.id, e.target.value)}
-                    />
-                    </td>
+                    <div className="flex flex-col items-center">
+                      <input 
+                        className="rounded-md w-20 h-8 text-center"
+                        disabled={params.idCompra}
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => updateCartQuantity(item.id, e.target.value)}
+                        onBlur={(e) => validateQuantity(item.id, e.target.value)}
+                      />
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-center"><span className="text-sm break-words">{item.unity}</span></td>
                   <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">{item.stock}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.priceIva}</td>
@@ -228,10 +249,43 @@ export default function page() {
         </div>
 
         <div className="flex justify-between px-5 mt-2 w-3/4">
-          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedBuy}>{params.idCompra ? "" : "Registrar compra"}</button>
-          <button className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>{params.idCompra ? "Eliminar compra" : "Cancelar compra"}</button>
+          <button hidden={params.idCompra} className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={() => setShowConfirm(true)}>{params.idCompra ? "" : "Registrar compra"}</button>
+          <button hidden={!valido} className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>{params.idCompra ? "Eliminar compra" : "Cancelar compra"}</button>
         </div>
         </div>
+        {showConfirm && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 className="text-xl font-bold mb-4">Confirmar compra</h2>
+                <p>¿Estás seguro que deseas finalizar esta compra?</p>
+                <p>_____________________________________</p>
+                <p className='mt-4'>Opcional</p>
+                <label htmlFor="code">Ingresa codigo de compra</label>
+                <input disabled={params.idCompra} id='codeFactura' type="text" onChange={(e) => setCode(e.target.value)} className='border rounded-md w-1/2 h-8' />
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      setShowConfirm(false);
+                      finishedBuy();
+                    }}
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
     </div>
   )
 }

@@ -11,11 +11,13 @@ import { useSale } from '@/app/Hooks/useSale'
 
 export default function () {
   const { selectedStore } = useStore();
-  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, finishSale, cart,setCart, totalCart, updateSale} = useSale()
+  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, finishSale, cart, setCart, totalCart, updateSale} = useSale()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [Clients, setClients] = useState(null)
   const [clientSelected, setClientSelected] = useState(null)
+  const [valido, setValido] = useState(true)
+
   const params = useParams();
 
   useEffect(() => {
@@ -25,11 +27,16 @@ export default function () {
         .then(res => res.json())
         .then(async data => {
           setCart(data.productos)
+          const hoy = new Date();
+          const fechaVenta = new Date(data.date);
+          const mismoMes = fechaVenta.getMonth() === hoy.getMonth() && fechaVenta.getFullYear() === hoy.getFullYear();
+          if(!mismoMes){
+            setValido(false)
+          }
           if (Clients) {
             const clienteObj = Clients.find(c => c.id === data.clienteId);
             if (clienteObj){
               setClientSelected(clienteObj);
-              
             } 
           } else {
             setClientSelected(data.clienteId);
@@ -65,8 +72,10 @@ export default function () {
           priceMay: item.priceMay,
           mayQuantity: item.mayQuantity,
           product_key: item.codesat,
-          unity: item.unities,
+          unity: item.unity,
+          unityCode: item.unityCode,
           stock: item.stock,
+          stockMin: item.stockMin
         }))
       })
   }
@@ -143,7 +152,11 @@ export default function () {
         <h1 className='text-3xl font-bold'>Nueva Venta</h1>
         <div className='mt-5 flex flex-col'>
           <h2 className='text-xl font-bold'>Selecciona el producto</h2>
-          <AsyncSelect className='w-4/5' onChange={addtoSale} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>
+          { !params.idVenta &&
+          <p></p>
+            }
+            <AsyncSelect isDisabled={params.idVenta} className='w-4/5' onChange={addtoSale} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>
+          
         </div>
         <div className='mt-6 flex'>
           <button className='bg-slate-700 hover:bg-slate-500 text-xl text-white rounded-md h-8' onClick={() => setIsOpen(true)}>Escoger un Cliente</button>
@@ -176,6 +189,8 @@ export default function () {
                   
                   <td className="border border-gray-300 px-4 py-2 text-center">
                     <input 
+                      disabled={params.idVenta}
+                      className={`${params.idVenta ? "cursor-none" : "cursor-pointer"}`}
                       type="number"
                       value={item.quantity}
                       onChange={(e) => updateCartQuantity(item.id, e.target.value)}
@@ -230,8 +245,8 @@ export default function () {
         </div>
 
         <div className="flex justify-between px-5 mt-2 w-3/4">
-          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedSale}>{params.idVenta ? "Actualizar Venta" : "Finalizar venta"}</button>
-          <button className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Venta</button>
+          <button hidden={valido} className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedSale}>{params.idVenta ? "Actualizar Venta" : "Finalizar venta"}</button> 
+          <button hidden={valido} className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Venta</button>
         </div>
         </div>
     </div>

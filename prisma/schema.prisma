@@ -15,7 +15,7 @@ datasource db {
 
 model user{
   id Int @id @default(autoincrement())
-  userName String
+  userName String @db.VarChar(512)
   email String @unique
   password String ?
   store StoreUser[]
@@ -67,12 +67,16 @@ model Sale {
 
 model clientes{
   id Int @id @default(autoincrement())
+  storeId  Int
   name String
+  rfc String? @db.VarChar(512)
+  razonSocial String? @db.VarChar(512)
+  regimenFiscal String? @db.VarChar(512) 
   phone String
   email String
   address String
-  storeId  Int
-
+  status Boolean ?
+  
   store    store   @relation(fields: [storeId], references: [id])
   sale    Sale[]
 }
@@ -85,7 +89,8 @@ model products{
   priceMen Int
   stockMin Int
   stock Int
-  unities String
+  unity String @map("unities")
+  unityCode String?
   description String
   status Boolean
   codesat Int
@@ -116,7 +121,7 @@ model Provider{
   address String
   rfc String
   storeId Int
-  codeProvider String
+  codeProvider String 
   status Boolean
 
   store store @relation(fields: [storeId], references: [id])

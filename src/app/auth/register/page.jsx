@@ -17,7 +17,7 @@ export default function Page() {
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.\-\/\\])[A-Za-z\d@$!%*?&.\-\/\\]{8,}$/;
 
-  const handleSendCode = async (email, userName) => {
+  /*const handleSendCode = async (email, userName) => {
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
     const realCode = generatedCode;
@@ -35,10 +35,13 @@ export default function Page() {
       console.error("Error enviando código:", error);
       setRegisterError("No se pudo enviar el código. Intente de nuevo.");
     });
-  };
+  };*/
 
   
   const onSubmit = handleSubmit(async (data) => {
+    if(data.userName.length < 3 || data.userName.length > 50) {
+      return setRegisterError("El nombre de usuario debe tener al menos 3 caracteres y maximo 50.");
+    }
     if (data.password !== data.confpassword) {
       return setPasswordError("Las contraseñas no coinciden.");
     } else {
@@ -46,9 +49,9 @@ export default function Page() {
     }
 
     // Validar que el código ingresado sea correcto antes de registrar al usuario
-    if (userInputCode !== verificationCode) {
+    /*if (userInputCode !== verificationCode) {
       return setRegisterError("El código ingresado es incorrecto.");
-    }
+    }*/
     const toastId = toast.loading("Registrando usuario...");
 
     const resp = await fetch("/api/auth/register", {
@@ -123,7 +126,7 @@ export default function Page() {
 
         {registerError && <p className="text-red-500 text-lg mb-4">{registerError}</p>}
         <br />
-        <button disabled={!isCodeSent} type="submit" className={isCodeSent ? `bg-black text-white rounded-xl w-[170px] h-[40px] text-2xl mt-2 hover:bg-gradient-to-r from-black to-slate-400` : `text-gray-200 rounded-xl w-[170px] h-[40px] text-2xl mt-2 bg-gray-300`}>Registrar</button>
+        <button type="submit" className={isCodeSent ? `bg-black text-white rounded-xl w-[170px] h-[40px] text-2xl mt-2 hover:bg-gradient-to-r from-black to-slate-400` : `text-gray-200 rounded-xl w-[170px] h-[40px] text-2xl mt-2 bg-gray-300`}>Registrar</button>
       </form>
       <Toaster position="top-right" reverseOrder={false} />
     </div>

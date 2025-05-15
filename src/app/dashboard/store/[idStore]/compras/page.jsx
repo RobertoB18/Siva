@@ -41,6 +41,7 @@ export default function compras() {
         <input type="text" placeholder="Buscar compra" className="border border-gray-300 w-full rounded-lg p-2" onChange={(e) => setSearch(e.target.value)} />
         <div className="mt-2 flex gap-2">
           <Link href="./compras/newCompra" className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Registar compra</Link>
+          <Link href="./proveedores" className="flex items-center justify-center bg-green-600 text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Añadir Proveedor</Link>
         </div>
       </div>
       <div className="h-screen w-3/4 flex flex-row ms-16 mt-5">
