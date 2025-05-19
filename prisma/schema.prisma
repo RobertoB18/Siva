@@ -121,7 +121,7 @@ model Provider{
   address String
   rfc String
   storeId Int
-  codeProvider String 
+  codeProvider String?
   status Boolean
 
   store store @relation(fields: [storeId], references: [id])

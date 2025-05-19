@@ -7,7 +7,8 @@ export async function GET(request, {params}){
     try {
       const cliente = await prisma.clientes.findMany({
           where:{
-            storeId: Number(idStore)
+            storeId: Number(idStore),
+            status: true
           },
           orderBy: [
             { name: 'asc' } 
@@ -20,6 +21,5 @@ export async function GET(request, {params}){
       console.log(error);
       return NextResponse.json({error: "Error al obtener los clientes"});
       
-    }
-    
+    } 
 }

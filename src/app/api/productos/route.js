@@ -47,9 +47,9 @@ export async function POST(request){
             "priceMay": createProduct.priceMay,
             "mayQuantity": createProduct.mayQuantity,
         }
-    })
-    console.log(crear);
-    return NextResponse.json(crear);
+      })
+      //console.log(crear);
+      return NextResponse.json(crear);
     } catch (error) {
       console.log(error)
       return NextResponse.json({error: "Error al crear el producto"}, {status:500});

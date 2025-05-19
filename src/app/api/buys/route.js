@@ -48,7 +48,7 @@ export async function POST(request) {
                 id: producto.id
             }
           });
-          const estado = true;
+          let estado = true;
           const stockTotal = products.stock + producto.quantity;
           if(stockTotal < products.stockMin) estado = false;
           await prisma.products.update({

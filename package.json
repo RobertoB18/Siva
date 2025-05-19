@@ -17,6 +17,8 @@
     "facturapi": "^4.8.1",
     "fs": "^0.0.1-security",
     "jsbarcode": "^3.11.6",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "next": "15.1.7",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",

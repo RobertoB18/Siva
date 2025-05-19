@@ -2,7 +2,6 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useForm } from "react-hook-form"
 import toast from 'react-hot-toast'
 import { useStore } from '@/Context/newStoreContext'
 import CodeBar from '@/components/CodeBar'
@@ -177,6 +176,7 @@ export default function () {
           <thead>
             <tr className="bg-black text-white">
                 <th className="border border-gray-300 px-4 py-2">Cantidad</th>
+                <th className="border border-gray-300 px-4 py-2">U. Medida</th>
                 <th className="border border-gray-300 px-4 py-2">Nombre</th>
                 <th className="border border-gray-300 px-4 py-2">Precio Unitario</th>
                 <th className="border border-gray-300 px-4 py-2">Precio Total</th>
@@ -196,7 +196,8 @@ export default function () {
                       onChange={(e) => updateCartQuantity(item.id, e.target.value)}
                       onBlur={(e) => validateQuantity(item.id, e.target.value)}
                     />
-                    </td>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-center"><span className="text-sm break-words">{item.unity}</span></td>
                   <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.price}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.total}</td>
@@ -245,8 +246,8 @@ export default function () {
         </div>
 
         <div className="flex justify-between px-5 mt-2 w-3/4">
-          <button hidden={valido} className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedSale}>{params.idVenta ? "Actualizar Venta" : "Finalizar venta"}</button> 
-          <button hidden={valido} className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Venta</button>
+          <button hidden={!valido} className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedSale}>{params.idVenta ? "Actualizar Venta" : "Finalizar venta"}</button> 
+          <button hidden={!valido} className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Venta</button>
         </div>
         </div>
     </div>

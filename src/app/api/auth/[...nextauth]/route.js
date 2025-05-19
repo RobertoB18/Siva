@@ -21,27 +21,30 @@ export const authOptions = {
                 email:{label:"Email", type:"text", placeholder:"Example1@gmail.com"},
                 password:{label:"Password", type:"password", placeholder:"**********"}
             },
-            async authorize(credentials, req){
-                const userFound = await prisma.user.findUnique({
-                    where:{
+            async authorize(credentials, req) {
+                try {
+                    const userFound = await prisma.user.findUnique({
+                    where: {
                         email: credentials.email,
-                    }
-                })
+                    },
+                    });
 
-                if(!userFound) throw new Error("Usuario no encontrado ")
-                
-                if(!userFound.password) throw new Error("Contraseña incorrecta o inicio de sesion con google");
-                console.log("hola");
-                
-                const match = await decryptPassword(userFound.password);
-                console.log(match);
+                    if (!userFound) throw new Error("Usuario no encontrado");
 
-                if(credentials.password !== match) throw new Error("Contraseña incorrecta o inicio de sesion con google");
-                
-                return {
+                    if (!userFound.password) throw new Error("Contraseña incorrecta o inicio de sesión con Google");
+
+                    const match = await decryptPassword(userFound.password);  // PUEDE FALLAR AQUÍ
+                    console.log(match);
+                    if (credentials.password !== match) throw new Error("Contraseña incorrecta o inicio de sesión con Google");
+
+                    return {
                     id: userFound.id,
                     email: userFound.email,
                     name: userFound.userName,
+                    };
+                } catch (error) {
+                    console.error("Error en authorize():", error); // Asegúrate que se vea en logs
+                    throw new Error("Error de autenticación");
                 }
             },
         }),

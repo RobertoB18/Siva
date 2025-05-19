@@ -40,8 +40,9 @@ export default function Ventas() {
     <div>
       <div className="flex flex-col items-start ms-16 mt-6 w-3/4 h-auto">
         <input type="text" placeholder="Buscar venta" className="border border-gray-300 w-full rounded-lg p-2" onChange={(e) => setSearch(e.target.value)} />
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 flex gap-4">
           <Link href="./ventas/newVenta " className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Nueva Venta</Link>
+          <Link href="./ventas/cotizacion " className="flex items-center justify-center bg-green-700 text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-green-600">+ Generar Cotizacion</Link>
         </div>
       </div>
       <div className="h-screen w-3/4 flex flex-row ms-16 mt-5">

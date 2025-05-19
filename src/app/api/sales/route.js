@@ -47,18 +47,31 @@ export async function POST(request) {
         });
 
         for (const producto of createSale.productos) {
-            await prisma.products.update({
-              where: { id: producto.id },
-              data: {
-                stock: {
-                  decrement: producto.quantity // Restar la cantidad vendida
-                }
+          const product = await prisma.products.findUnique({
+            where: { id: producto.id }
+          });
+
+          let state = true;
+          const stockTotal = product.stock - producto.quantity;
+          console.log(stockTotal);
+          
+          if(stockTotal < product.stockMin) state = false;
+          
+          console.log(state);
+          await prisma.products.update({
+            where: { id: producto.id },
+            data: {
+              status: state,
+              stock: {
+                decrement: producto.quantity // Restar la cantidad vendida
               }
-            });
+            }
+          });
         }
         
         return NextResponse.json(newSale);
     } catch (error) {
+      console.log(error);
         return new NextResponse.json({error: "Error al crear la venta"}, {status:500});
     }
 }
