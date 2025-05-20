@@ -44,7 +44,7 @@ export default function () {
         })
         .catch(error => toast.error("Error al cargar la venta", { id: toastId }));
       }
-    }, [params.idVentas, Clients]);
+    }, [params.idVenta, Clients]);
 
   useEffect(() => {
     
@@ -62,6 +62,11 @@ export default function () {
     return fetch(`/api/searchProduct?q=${inputValue}&idStore=${selectedStore}`) // Cambia la URL según tu API
       .then((response) => response.json())
       .then((data) => {
+        if (!Array.isArray(data)) {
+          console.error("searchProduct no devolvió un array:", data);
+          return [];
+        }
+
         return data.map((item) => ({
           label: `${item.name} `,
           id: item.id,
@@ -180,7 +185,7 @@ export default function () {
                 <th className="border border-gray-300 px-4 py-2">Nombre</th>
                 <th className="border border-gray-300 px-4 py-2">Precio Unitario</th>
                 <th className="border border-gray-300 px-4 py-2">Precio Total</th>
-                <th className="border border-gray-300 px-4 py-2">Acciones</th>
+                {!params.idVenta && <th className="border border-gray-300 px-4 py-2">Acciones</th>}
             </tr>
             </thead>
             <tbody>
@@ -201,11 +206,13 @@ export default function () {
                   <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.price}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.total}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
-                    <button onClick={() => removeFromCart(item.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">
-                      Eliminar
-                    </button> 
-                  </td>
+                  {!params.idVenta &&
+                    <td className="border border-gray-300 px-4 py-2 text-center">
+                      <button onClick={() => removeFromCart(item.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">
+                        Eliminar
+                      </button> 
+                    </td>
+                  }
                 </tr>
               ))
               }

@@ -41,7 +41,7 @@ export default function page() {
               setProviderSelected(providerObj);
             } 
           } else {
-            console.log(data.providerId)
+            //console.log(data.providerId)
             setProviderSelected(data.providerId);
           }
           toast.success("Compra cargada", { id: toastId });
@@ -66,6 +66,10 @@ export default function page() {
     return fetch(`/api/searchProduct?q=${inputValue}&idStore=${selectedStore}&casse=1`) // Cambia la URL según tu API
       .then((response) => response.json())
       .then((data) => {
+        if (!Array.isArray(data)) {
+          console.error("searchProduct no devolvió un array:", data);
+          return [];
+        }
         return data.map((item) => ({
           label: `${item.name} `,
           id: item.id,
@@ -128,7 +132,7 @@ export default function page() {
         clearCart()
       }
       
-      //router.refresh();
+      router.refresh();
       router.push("../compras");
     } catch (error) {
       console.log(error)
@@ -178,11 +182,11 @@ export default function page() {
                 <th className="border border-gray-300 px-4 py-2">Precio S/IVA</th>
                 <th className="border border-gray-300 px-4 py-2">Precio de Compra </th>
                 <th className="border border-gray-300 px-4 py-2">Precio Total</th>
-                <th className="border border-gray-300 px-4 py-2">Acciones</th>
+                {!params.idCompra && <th className="border border-gray-300 px-4 py-2">Acciones</th>}
             </tr>
             </thead>
             <tbody>
-              { cart.map((item) => (
+              {cart && cart.map((item) => (
                 <tr key={item.id}>
                   
                   <td className="border border-gray-300 px-4 py-2 text-center">
@@ -203,11 +207,15 @@ export default function page() {
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.priceIva}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.priceCost}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">${item.total}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
-                    <button onClick={() => removeFromCart(item.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">
-                      Eliminar
-                    </button> 
-                  </td>
+                  
+                  {!params.idCompra &&
+                    <td className="border border-gray-300 px-4 py-2 text-center">
+                      <button onClick={() => removeFromCart(item.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">
+                        Eliminar
+                      </button> 
+                    </td>
+                  }
+                  
                 </tr>
               ))
               }

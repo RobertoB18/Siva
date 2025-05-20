@@ -11,7 +11,8 @@ export async function GET(request, {params}){
         //console.log(searchSale);
         return NextResponse.json(searchSale);
     } catch (error) {
-        console.log("Valio vrg scooby "+ error);
+        console.log(error);
+        return NextResponse.json([], {status:500});
     }
 }
 

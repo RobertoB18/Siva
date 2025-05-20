@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import WacthProviders from "@/components/WatchProviders";
+import WacthClients from "@/components/WatchClients";
 import { useStore } from "@/Context/newStoreContext";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -17,20 +17,20 @@ export default function compras() {
     const toastId = toast.loading("Cargando...")
     const productos = async () => {
       try {
-        const resp = await fetch(`/api/providers?idStore=${selectedStore}`)
+        const resp = await fetch(`/api/clientes?idStore=${selectedStore}&casse=1`)
         const data = await resp.json()
         setData(data)
         console.log(data)
-        toast.success("Proveedores cargados", { id: toastId })
+        toast.success("Clientes cargados", { id: toastId })
       } catch (error) {
-        toast.error("Error al cargar los proveedores", { id: toastId })
+        toast.error("Error al cargar los clientes", { id: toastId })
       }
     };
     productos()
   }, [selectedStore])  
 
-  const filteredData = data.filter(provider =>{
-    return provider.name.toLowerCase().includes(search.toLowerCase())
+  const filteredData = data.filter(cliente =>{
+    return cliente.name.toLowerCase().includes(search.toLowerCase())
   }
   );
 
@@ -54,8 +54,8 @@ export default function compras() {
                 <th className="border border-gray-300 px-4 py-2">Opciones</th>
             </tr>
           </thead>
-          {filteredData.map(provider => (
-              <WacthProviders provider={provider} key={provider.id}/>
+          {filteredData.map(client => (
+              <WacthClients client={client} key={client.id}/>
             ))
           }
         </table>

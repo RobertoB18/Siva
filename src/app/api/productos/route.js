@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 export async function GET(request, {params}){
     const { searchParams } = new URL(request.url);
     const idStore = searchParams.get("idStore");
-    
-    const products = await prisma.products.findMany({
+    try {
+        const products = await prisma.products.findMany({
         where:{
           storeId: Number(idStore)
         },
@@ -16,6 +16,12 @@ export async function GET(request, {params}){
       }
     );
     return NextResponse.json(products);
+    } catch (error) {
+        console.log("Error al obtener el id de la tienda", error);
+        return NextResponse.json([], {status:500});
+      
+    }
+
 }
 
 export async function POST(request){

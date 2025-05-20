@@ -24,27 +24,28 @@ export const authOptions = {
             async authorize(credentials, req) {
                 try {
                     const userFound = await prisma.user.findUnique({
-                    where: {
-                        email: credentials.email,
-                    },
+                        where: {
+                            email: credentials.email,
+                        },
                     });
 
                     if (!userFound) throw new Error("Usuario no encontrado");
 
                     if (!userFound.password) throw new Error("Contraseña incorrecta o inicio de sesión con Google");
 
-                    const match = await decryptPassword(userFound.password);  // PUEDE FALLAR AQUÍ
-                    console.log(match);
-                    if (credentials.password !== match) throw new Error("Contraseña incorrecta o inicio de sesión con Google");
+                    const match = await decryptPassword(userFound.password);
+                    if (credentials.password !== match)
+                        throw new Error("Contraseña incorrecta o inicio de sesión con Google");
 
                     return {
-                    id: userFound.id,
-                    email: userFound.email,
-                    name: userFound.userName,
+                        id: userFound.id,
+                        email: userFound.email,
+                        name: userFound.userName,
                     };
                 } catch (error) {
-                    console.error("Error en authorize():", error); // Asegúrate que se vea en logs
-                    throw new Error("Error de autenticación");
+                    console.error("Error en authorize():", error);
+                    // Reenviar el mensaje específico del error original
+                    throw new Error(error.message || "Error de autenticación");
                 }
             },
         }),

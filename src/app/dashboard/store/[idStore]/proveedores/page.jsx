@@ -17,7 +17,7 @@ export default function compras() {
     const toastId = toast.loading("Cargando...")
     const productos = async () => {
       try {
-        const resp = await fetch(`/api/providers?idStore=${selectedStore}`)
+        const resp = await fetch(`/api/providers?idStore=${selectedStore}&casse=1`)
         const data = await resp.json()
         setData(data)
         console.log(data)

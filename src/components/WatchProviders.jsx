@@ -4,10 +4,9 @@ import Link from 'next/link';
 import Image from "next/image";
 
 export default function WacthProviders({provider}) {
-  console.log(provider);
   return (
     <tbody>
-        <tr>
+        <tr className={`${provider.status? "bg-white": "bg-slate-200"}`}>
             <td className="border border-gray-300 px-4 py-2 ">{provider.rfc}</td>
             <td className="border border-gray-300 px-4 py-2 ">{provider.name}</td>
             <td className="border border-gray-300 px-4 py-2">{provider.phone}</td>

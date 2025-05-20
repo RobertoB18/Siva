@@ -4,21 +4,38 @@ import { NextResponse } from "next/server";
 export async function GET(request, {params}){
     const { searchParams } = new URL(request.url);
     const idStore = searchParams.get("idStore");
+    const casse = searchParams.get("casse");
     try {
+      if(casse === "1") {
+        const providers = await prisma.provider.findMany({
+          where:{
+            storeId: Number(idStore), 
+          },
+          orderBy: [
+            {status: 'desc'},
+            { name: 'asc' } 
+          ]
+        }
+      );
+      
+      return NextResponse.json(providers);
+    }
       const providers = await prisma.provider.findMany({
           where:{
             storeId: Number(idStore), 
           },
           orderBy: [
+            
             { name: 'asc' } 
           ]
         }
       );
-      return NextResponse.json(providers);
 
+      const providerAvailable = providers.filter(cliente => cliente.status === true);
+      return NextResponse.json(providerAvailable);
     } catch (error) {
-      console.log(error);
-      return NextResponse.json({error: "Error al obtener los proveedores"});
+      //console.log(error);
+      return NextResponse.json([], {status:500});
     }   
 }
 export async function POST(request){
@@ -48,7 +65,7 @@ export async function POST(request){
     })
     return NextResponse.json(crear);
   } catch (error) {
-    console.log("Error al crear el proveedor", error);
+    //console.log("Error al crear el proveedor", error);
     return NextResponse.json({error: "Error al crear el proveedor"}, {status:500});
     
   }

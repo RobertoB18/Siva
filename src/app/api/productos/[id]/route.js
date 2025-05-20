@@ -12,6 +12,7 @@ export async function GET(request, {params}){
         return NextResponse.json(searchProduct);
     } catch (error) {
         console.log("Valio vrg scooby "+ error);
+        return NextResponse([], {status:500});
     }
     
 }

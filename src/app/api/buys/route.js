@@ -25,7 +25,7 @@ export async function GET(request) {
         );
         return NextResponse.json(compra);
     } catch (error) {
-        return NextResponse.json({error: "Error al obtener las compras "}, {status:500});
+        return NextResponse.json([], {status:500});
     }
 }
 

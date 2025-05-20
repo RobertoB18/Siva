@@ -57,6 +57,7 @@ export default function () {
           return
         }
         generatePdf(selectedStore)
+        clearCart()
         toast.success("Generado con exito", { id: toastId })
         router.push("../ventas");
     } catch (error) {
@@ -82,7 +83,7 @@ export default function () {
         <img src="/volver.png" width={30} height={30} alt="Regresar" />
       </Link>
       <div>
-        <h1 className='text-3xl font-bold'>Nueva Venta</h1>
+        <h1 className='text-3xl font-bold'>Generar cotizacion</h1>
         <div className='mt-5 flex flex-col'>
             <h2 className='text-xl font-bold'>Selecciona el producto</h2>
             <AsyncSelect className='w-4/5' onChange={addtoSale} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>

@@ -11,7 +11,7 @@ export async function GET(request, {params}){
         return NextResponse.json(searchBuy);
     } catch (error) {
         console.log("No se encontro la compra"+ error);
-        return NextResponse.json({error: "No se encontro la compra"}, {status:500});
+        return NextResponse.json([], {status:500});
     }
 }
 

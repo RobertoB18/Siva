@@ -49,7 +49,7 @@ export default function NewProvider() {
       address: data.address,
       status: data.status,
       rfc: data.rfc,
-      storeId: selectedStore,
+      storeId: Number(selectedStore),
       codeProvider: data.code,
     };
     //console.log("Payload:", payload);

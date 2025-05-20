@@ -28,7 +28,7 @@ export async function GET(request) {
 
     } catch (error) {
         console.log(error);
-        return NextResponse.json({error: "Error al obtener los clientes"});
+        return NextResponse.json([], {status:500});
     }
     
 }
