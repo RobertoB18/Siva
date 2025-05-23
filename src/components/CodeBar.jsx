@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import JsBarcode from 'jsbarcode';
+import BarcodeScannerPage from './ScanCode';
 
 function aleatorioNum(){
     return Math.floor(10000000 + Math.random() * 90000000).toString();
@@ -8,6 +9,7 @@ function aleatorioNum(){
 export default function CodeBar({ register, setValue, defaultValue }) {
     const svg = useRef(null);
     const [code, setCode] = useState("");
+    const [mode, setMode] = useState("none");
 
     const nuevoCodigo = () => {
         const nuevo = aleatorioNum();

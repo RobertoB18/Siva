@@ -36,10 +36,10 @@ export default function StoreNav() {
               }`}
             >
               <Link 
-                href={`/dashboard/store/${store.id}`}
+                href={`/dashboard/store/${store.id}/inicio`}
                 onClick={() => selectStore(store.id)} // Guarda la tienda seleccionada en el contexto
               >
-                {store.name}
+                <img className={`rounded-full object-cover w-12 h-12 transition-all duration-500 ${currentStoreId === store.id.toString() ? "opacity-70" : ""}`} src={store.logo} alt="Vista previa" width="200" height="50"/>
               </Link>
             </li>
           ))

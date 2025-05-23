@@ -34,7 +34,7 @@ export async function GET(request) {
             },           
         });
         
-        const productsAvailable = products.filter(producto => producto.stock > producto.stockMin && producto.status === true);
+        const productsAvailable = products.filter(producto => producto.stock >= producto.stockMin && producto.status === true);
         
         return NextResponse.json(productsAvailable);
     } catch (error) {

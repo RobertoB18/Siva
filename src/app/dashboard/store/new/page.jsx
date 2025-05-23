@@ -6,43 +6,73 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useStore } from '@/Context/newStoreContext'
 import toast, { Toaster } from "react-hot-toast";
+import ImagenLogo from '@/components/ImagenLogo'
 
-export default function page() {
+export default function newStore() {
 
   const router = useRouter();
   const params = useParams();
-  const {addStore} = useStore()
+  const {addStore, updateStore} = useStore()
 
-  const {register, handleSubmit, formState: {errors}} = useForm();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const {register, handleSubmit, setValue, formState: {errors}} = useForm();
+  const [logo, setLogo] = useState(null);
+  const [file, setFile] = useState({});
 
   useEffect(() => {
-      if (params.idProduct) {
-          fetch(`/api/${params.idProduct}`)
-              .then((res) => {
-                  if (!res.ok) throw new Error("Error en la petición");
-                  return res.json();
-              })
-              .then((data) => {
-                  setName(data.name);
-                  setEmail(data.email),
-                  setPhone(data.phone),
-                  setAddress(data.address)
-              })
-              .catch(error => console.error("Error al obtener el producto:", error));
+      if (params.idStore) {
+          fetch(`/api/${params.idStore}`)
+          .then((res) => {
+              if (!res.ok) throw new Error("Error en la petición");
+              return res.json();
+          })
+          .then((data) => {
+            setLogo(data.logo),
+            setValue("name", data.name),
+            setValue("email", data.email),
+            setValue("phone",data.phone),
+            setValue("address",data.address)
+          })
+          .catch(error => console.error("Error al obtener el producto:", error));
       }
   }, []); 
 
-  const onSubmit = handleSubmit(async (e) => {
+  const onSubmit = handleSubmit(async (data) => {
     const toastId = toast.loading("Creando negocio...");
-
+    
+    let uploadedImageUrl = logo;
     try {
-      const newStore = {name, email, phone, address};
-      await addStore(newStore);
-      toast.success("Registro exitoso", { id: toastId });
+      if (file && file.name) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "preset_publico");
+
+        const res = await fetch( `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const cloudinaryData = await res.json();
+        uploadedImageUrl = cloudinaryData.secure_url;
+      }
+
+      const payload = {
+        name: data.name, 
+        email: data.email, 
+        phone: data.phone, 
+        address: data.address,
+        logo: uploadedImageUrl,
+        storeId: Number(params.idStore),
+      };
+      console.log("payload", payload);
+      if(params.idStore){
+        await updateStore(payload,);
+        toast.success("Actualización exitosa", { id: toastId });
+      }
+      else{
+        await addStore(payload);
+        toast.success("Registro exitoso", { id: toastId });
+      }
+      router.refresh();
       router.push("/dashboard")
 
     } catch (error) {
@@ -50,23 +80,25 @@ export default function page() {
     }
   })
   return (
-    <div className='flex flex-col justify-center items-center h-3/4'>
+    <div className="min-h-screen flex flex-col items-center overflow-y-auto px-4 py-8">
       <h1 className='text-4xl font-bold mt-10 '>Crear nueva Empresa</h1>
       <form className='flex flex-col w-3/4 p-10'onSubmit={onSubmit}>
         
-        <label htmlFor="name">Nombre de la tienda</label>
-        <input id="name" type="text" className={`border rounded-md p-1 mb-4 ${errors.name ? "border-red-400 border-2": "border-gray-500"}`} placeholder='Nombre de la tienda' {...(register("name", {required: true,} ))} onChange={e => setName(e.target.value)} value={name}/>
-        
+        <label htmlFor="name">Nombre Tienda</label>
+        <input disabled={params.idStore} id="name" {...register("name", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.name ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="Ej. Tortilla" />
+              
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" className={`border rounded-md p-1 mb-4 w-full text-black ${errors.email ? "border-red-400 border-2": "border-gray-500"}`} placeholder="example1@gmail.com" {...(register("email", {required: true,} ))} onChange={e => setEmail(e.target.value)} value={email}/>
+        <input id="email" type="text" className={`border rounded-md p-1 mb-4 w-full text-black ${errors.email ? "border-red-400 border-2": "border-gray-500"}`} placeholder="example1@gmail.com" {...(register("email", {required: true,} ))}/>
 
         <label htmlFor="phone">Telefono de la tienda</label>
-        <input type="text" name="phone" id="phone" placeholder='Telefono de la tienda' className={`border rounded-md p-1 mb-4 ${errors.phone ? "border-red-400 border-2": "border-gray-500"}`} {...(register("phone", {required: true,} ))} onChange={e => setPhone(e.target.value)} value={phone}/>
+        <input type="text" name="phone" id="phone" placeholder='Telefono de la tienda' className={`border rounded-md p-1 mb-4 ${errors.phone ? "border-red-400 border-2": "border-gray-500"}`} {...(register("phone", {required: true,} ))}/>
         
         <label htmlFor="address">Direccion de la tienda</label>
-        <input type="text" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.address ? "border-red-400 border-2": "border-gray-500"}`} {...(register("address", {required: true,} ))} onChange={e => setAddress(e.target.value)} value={address}/>
+        <input type="text" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.address ? "border-red-400 border-2": "border-gray-500"}`} {...(register("address", {required: true,} ))}/>
         
-        <button type='submit' className='bg-slate-900 text-white rounded-lg p-2'>Crear</button>
+        <ImagenLogo register={register} setValue={setValue} defaultValue={logo} errors={errors} setFile={setFile}/>
+        
+        <button type='submit' className='bg-slate-900 text-white rounded-lg p-2'>{params.idStore ? "Actualizar tienda" : "Crear tienda"}</button>
       </form>
       <Toaster position="top-right" reverseOrder={false} />
     </div>

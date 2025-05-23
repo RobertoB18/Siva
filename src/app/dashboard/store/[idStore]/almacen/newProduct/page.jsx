@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { useStore } from '@/Context/newStoreContext'
 import CodeBar from '@/components/CodeBar'
 import AsyncSelect from 'react-select/async'
+import BarcodeScannerPage from '@/components/ScanCode'
 
 export default function NewProduct() {
   const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm();
@@ -16,6 +17,7 @@ export default function NewProduct() {
 
   const [loadCodeBar, setLoadCodeBar] = useState(null);
   const [selectedUnidad, setSelectedUnidad] = useState(null);
+  const [mode, setMode] = useState("none");
   
   const priceCost = watch("priceCost");
 
@@ -26,6 +28,7 @@ export default function NewProduct() {
       fetch(`/api/productos/${params.idProduct}`)
         .then(res => res.json())
         .then(async data => {
+          setMode("generate");
           setLoadCodeBar(data.codeBar);
           setValue("name", data.name);
           setValue("description", data.description);
@@ -38,12 +41,12 @@ export default function NewProduct() {
           setValue("status", data.status);
           setValue("mayQuantity", data.mayQuantity);
           setValue("codeBar", data.codeBar);
-
-          const resUnidad = await fetch(`/api/unity?q=${data.unities}`);
+          console.log(data.unity)
+          const resUnidad = await fetch(`/api/unity?q=${data.unityCode}`);
           const dataUnidad = await resUnidad.json();
           console.log(dataUnidad);
           
-          const unidad = dataUnidad.data.find(u => u.key === data.unities);
+          const unidad = dataUnidad.data.find(u => u.key === data.unityCode);
 
           if (unidad) {
             setSelectedUnidad({
@@ -94,7 +97,7 @@ export default function NewProduct() {
       toast.error("Debes seleccionar una unidad de medida", { id: toastId });
       return;
     }
-    if(!data.codesat || data.codesat.length < 8){
+    if(!data.codesat || data.codesat.length < 8 || data.codesat.length > 8){
       toast.error("El codigo SAT debe tener 8 digitos", { id: toastId });
       return;
     }
@@ -110,12 +113,12 @@ export default function NewProduct() {
       unityCode: selectedUnidad.value,
       description: data.description,
       status: data.status,
-      codesat: Number(data.codesat),
+      codesat: data.codesat,
       priceMay: Number(data.priceMay),
       mayQuantity: Number(data.mayQuantity),
-      codeBar: Number(data.codeBar),
+      codeBar: data.codeBar,
     };
-    console.log("Payload:", payload);
+    //console.log("Payload:", payload);
 
     try {
       if (params.idProduct) {
@@ -208,12 +211,43 @@ export default function NewProduct() {
 
               <label htmlFor="quantityMay">Cantidad Mayoreo</label>
               <input id="quantityMay" type="number" {...register("mayQuantity")} className="border border-gray-500 p-2 mb-4 w-full text-black rounded-lg" placeholder="5" disabled={!watch("priceMay")} />
-              <CodeBar
-                register={register}
-                setValue={setValue}
-                defaultValue={loadCodeBar}
-                
-              />
+              <div className="my-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setMode("generate")}
+                  className={`px-4 py-2 rounded ${mode === "generate" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                >
+                  Generar Código de Barras
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("scan")}
+                  className={`px-4 py-2 rounded ${mode === "scan" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                >
+                  Escanear Código de Barras
+                </button>
+              </div>
+              {mode === "generate" && (
+                <div className="my-4">
+                  <CodeBar
+                    register={register}
+                    setValue={setValue}
+                    defaultValue={loadCodeBar}
+                  />
+                </div>
+              )}
+
+              {mode === "scan" && (
+                <div className="my-4">
+                  <BarcodeScannerPage
+                  setloadCodeBar={setLoadCodeBar}
+                  setValue={setValue}
+                  setMode={setMode}
+
+                  />
+                </div>
+              )}
+              
             </div>
             
           </div>

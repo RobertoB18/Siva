@@ -27,6 +27,10 @@ model store{
   address String
   phone String
   email String
+  rfc  String? @db.VarChar(512)
+  logo String?
+  key String?
+  cer String? 
   
   user StoreUser[]
   clientes  clientes[]
@@ -39,18 +43,12 @@ model store{
 model StoreUser{
   storeId Int
   userId Int
+  permissions String[] @default([]) // Ej: ["ventas", "compras"]
+
   storeRef store @relation(fields: [storeId], references: [id], onDelete: Cascade)
   userRef user @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, storeId])
-}
-
-model compra{
-  id Int @id @default(autoincrement())
-  name String
-  price Int
-  quantity Int
-  total Int
 }
 
 model Sale {
@@ -60,6 +58,7 @@ model Sale {
   productos Json
   date     DateTime @default(now())
   total    Float
+  status Boolean @default(false)
   
   clientes clientes? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -93,10 +92,10 @@ model products{
   unityCode String?
   description String
   status Boolean
-  codesat Int
+  codesat String
   priceMay Int?
   mayQuantity Int?
-  codeBar Int? 
+  codeBar String? 
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 

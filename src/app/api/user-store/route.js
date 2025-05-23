@@ -13,7 +13,6 @@ export async function GET() {
   console.log("Usuario autenticado:", session.user);
   
   try {
-
     // Buscar al usuario y traer las tiendas a las que pertenece
     const userStores = await prisma.user.findUnique({
       where: { email: session.user.email }, // Buscar usuario por su email
@@ -24,6 +23,7 @@ export async function GET() {
               select: {
                 id: true,
                 name: true,
+                logo: true,
               }                                                               
             }
           }
@@ -51,9 +51,9 @@ export async function GET() {
 
 export async function POST(request, {params}){
   const newStore = await request.json();
-  console.log(newStore);
+  //console.log(newStore);
   const session = await getServerSession(authOptions);
-  console.log("Este es el ide de la tienda "+ session.user.email);
+  //console.log("Este es el ide de la tienda "+ session.user.email);
   try {
       const crearStore = await prisma.store.create({
           data: {
@@ -61,6 +61,7 @@ export async function POST(request, {params}){
               "email": newStore.email,
               "phone": newStore.phone,
               "address": newStore.address,
+              "logo": newStore.logo,
           }
       })
       console.log(crearStore);
@@ -68,6 +69,7 @@ export async function POST(request, {params}){
           data:{
               "storeId": crearStore.id,
               "userId": session.user.id,
+              "permissions": ["admin"],
           }
       })
       console.log(storeRef);

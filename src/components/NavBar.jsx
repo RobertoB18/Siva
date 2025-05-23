@@ -22,11 +22,12 @@ export default function NavBar() {
       <aside className="sticky h-screen w-[190px] bg-black top-0 left-0">
         <ul className="px-2 items-center flex-col text-xl">
           {[
-            { name: "Home", path: "/dashboard/store/"+selectedStore },
+            { name: "Home", path: "/dashboard/store/"+selectedStore +"/inicio" },
             { name: "Compra", path: "/dashboard/store/"+selectedStore + "/compras"  },
             { name: "Venta", path: "/dashboard/store/"+selectedStore +"/ventas" },
             { name: "Almacen", path: "/dashboard/store/"+selectedStore + "/almacen" },
             { name: "Contabilidad", path: "/dashboard/store/"+selectedStore + "/contabilidad" },
+            { name: "Ajustes", path: `/dashboard/store/${selectedStore}` }, // ✅ nueva opción
           ].map((item) => (
             <li
               key={item.path}

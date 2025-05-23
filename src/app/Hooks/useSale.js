@@ -20,17 +20,21 @@ export function useSale() {
 
     function addtoSale(item){
         const itemexist = cart.findIndex(product => product.id === item.id)
-        //console.log("item", item)
         if(itemexist >= 0 ){
+
             const updateCart = [...cart]
-            updateCart[itemexist].quantity++
-            console.log(updateCart[itemexist].quantity)
-            updateCart[itemexist].total = getUnitPrice(updateCart[itemexist]) * (updateCart[itemexist].quantity)
-            updateCart[itemexist].price = getUnitPrice(updateCart[itemexist])
-            const priceIva = Number(updateCart[itemexist].price) / 1.16
-            console.log(priceIva)
-            updateCart[itemexist].priceIva = (Number(updateCart[itemexist].price) / 1.16).toFixed(2)
-            setCart(updateCart)
+            const currentQuantity = updateCart[itemexist].quantity;
+
+            if(currentQuantity < updateCart[itemexist].stock){
+                updateCart[itemexist].quantity++
+                updateCart[itemexist].total = getUnitPrice(updateCart[itemexist]) * (updateCart[itemexist].quantity)
+                updateCart[itemexist].price = getUnitPrice(updateCart[itemexist])
+                const priceIva = Number(updateCart[itemexist].price) / 1.16
+                console.log(priceIva)
+                updateCart[itemexist].priceIva = (Number(updateCart[itemexist].price) / 1.16).toFixed(2)
+                setCart(updateCart)
+            }
+            
         }else{
             const total = item.priceMen
             const priceIva = Number(item.priceMen) / 1.16

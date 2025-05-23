@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useStore } from '@/Context/newStoreContext'
-import CodeBar from '@/components/CodeBar'
 import AsyncSelect from 'react-select/async'
 import { useSale } from '@/app/Hooks/useSale'
+import BarcodeScannerPage from '@/components/ScanCode'
 
 export default function () {
   const { selectedStore } = useStore();
@@ -16,6 +16,7 @@ export default function () {
   const [Clients, setClients] = useState(null)
   const [clientSelected, setClientSelected] = useState(null)
   const [valido, setValido] = useState(true)
+  const [mode, setMode] = useState(false)
 
   const params = useParams();
 
@@ -75,7 +76,7 @@ export default function () {
           priceMen: item.priceMen,
           priceMay: item.priceMay,
           mayQuantity: item.mayQuantity,
-          product_key: item.codesat,
+          codesat: item.codesat,
           unity: item.unity,
           unityCode: item.unityCode,
           stock: item.stock,
@@ -154,13 +155,14 @@ export default function () {
       </Link>
       <div>
         <h1 className='text-3xl font-bold'>Nueva Venta</h1>
-        <div className='mt-5 flex flex-col'>
-          <h2 className='text-xl font-bold'>Selecciona el producto</h2>
-          { !params.idVenta &&
-          <p></p>
-            }
+        <div className='mt-5 flex flex-col' >
+          <button hidden={params.idVenta} className='text-xl font-bold bg-black text-white rounded-md w-1/4 h-10 mb-5' onClick={() => setMode(!mode)}>{mode ? "Ingresar producto" : "Escanear codigo"}</button>
+          { mode ?
+            <BarcodeScannerPage className="h-5" addtoSale={addtoSale} setMode={setMode} /> :
             <AsyncSelect isDisabled={params.idVenta} className='w-4/5' onChange={addtoSale} loadOptions={options} placeholder="Buscar producto..." defaultOptions cacheOptions> </AsyncSelect>
           
+          }
+            
         </div>
         <div className='mt-6 flex'>
           <button className='bg-slate-700 hover:bg-slate-500 text-xl text-white rounded-md h-8' onClick={() => setIsOpen(true)}>Escoger un Cliente</button>

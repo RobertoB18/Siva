@@ -4,7 +4,33 @@ import { NextResponse } from "next/server";
 export async function GET(request, {params}){
     const { searchParams } = new URL(request.url);
     const idStore = searchParams.get("idStore");
+    const codeBar = searchParams.get("codeBar");
+
     try {
+        if(codeBar){
+          const product = await prisma.products.findFirst({
+            where: {
+              codeBar: codeBar,
+              storeId: Number(idStore),
+              status: true
+            },
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              priceMen: true,
+              priceMay: true,
+              mayQuantity: true,
+              codesat: true,
+              unity: true,
+              unityCode: true,
+              stockMin: true,
+              stock: true,
+            }
+          });
+          if(!product) return NextResponse.json({error: "No se encontro el producto"}, {status:404});
+          return NextResponse.json(product);
+        }
         const products = await prisma.products.findMany({
         where:{
           storeId: Number(idStore)
@@ -27,6 +53,7 @@ export async function GET(request, {params}){
 export async function POST(request){
     const createProduct = await request.json();
     console.log(createProduct);
+    
     try {
       const existe = await prisma.products.findFirst({
         where: {

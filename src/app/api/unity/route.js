@@ -15,6 +15,6 @@ export async function GET(request) {
       return NextResponse.json(searchResult);
     } catch (error) {
       console.log("Error en la respuesta de la API:", error.message);
-      return NextResponse.json("Error");
+      return NextResponse.json([], {status:500});
     }
 }

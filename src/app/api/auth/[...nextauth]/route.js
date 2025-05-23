@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import encryptOption from "@/app/Hooks/encryptOption.js"
 import {prisma} from "@/libs/prisma"
+import { use } from "react";
 
 const [encryptPassword,decryptPassword] = encryptOption();
 
@@ -36,7 +37,8 @@ export const authOptions = {
                     const match = await decryptPassword(userFound.password);
                     if (credentials.password !== match)
                         throw new Error("Contraseña incorrecta o inicio de sesión con Google");
-
+                    
+                    console.log(userFound);
                     return {
                         id: userFound.id,
                         email: userFound.email,
