@@ -41,6 +41,15 @@ export default function NewProvider() {
       toast.error("El numero telefonico debe ser de 10 digitos", { id: toastId });
       return;
     }
+    const regexRFC = /^[A-ZÑ&]{3,4}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z\d]{2}[A\d]$/;
+    if (!regexRFC.test(data.rfc)) {
+      toast.error("El RFC es invalido", { id: toastId });
+      return;
+    }
+    if(data.address.length !== 5){
+      toast.error("El codigo postal debe ser de 5 digitos", { id: toastId });
+      return;
+    }
       
     const payload = {
       name: data.name,
@@ -102,11 +111,16 @@ export default function NewProvider() {
               <label htmlFor="email">Correo electronico</label>
               <input id="email" type="text" {...register("email", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.email ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1" />
               
-              <label htmlFor="address">Direccion</label>
-              <input id="address" type="text" {...register("address", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.address ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1"/>
+              <label htmlFor="address">Codigo Postal</label>
+              <input id="address" type="number" {...register("address", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.address ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1"/>
               
               <label htmlFor="rfc"><span>RFC Proveedor</span>
-              <input id="rfc" type="text" {...register("rfc", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.rfc ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="$15" />
+              <input id="rfc" type="text" {...register("rfc", { required: true })} 
+                onBlur={(e) => {
+                const upper = e.target.value.toUpperCase(); // Convierte a mayúsculas
+                setValue("rfc", upper); // Actualiza el valor en el formulario
+                }} 
+              className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.rfc ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="SAMNXXXXXXXXX" />
               </label>              
   
               <label htmlFor="code">Codigo de proveedor</label>

@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo} from "react"
+import { useState, useEffect, useMemo, use} from "react"
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export function useSale() {
-    
+
+    const [maxDescuento, setMaxDescuento] = useState(null) 
+    const [store, setStore] = useState(null)
+    const [descuento, setDescuento] = useState(0)
     const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
             const localStorageCart = localStorage.getItem("cart");
@@ -12,11 +15,20 @@ export function useSale() {
         return [];
     });
     
-    useEffect(()=>{
-        if (typeof window !== "undefined") {
-            localStorage.setItem("cart", JSON.stringify(cart));
+    useEffect(() => {
+        if (store) {
+        fetch(`/api/${store}`) // Ajusta la ruta según tu backend
+            .then((response) => response.json())
+            .then((data) => {
+            setMaxDescuento(data.descuento); // ✅ Guarda en el estado
+            })
+            .catch((err) => {
+            console.error("Error al obtener el descuento máximo:", err);
+            setMaxDescuento(null);
+            });
         }
-    }, [cart])
+    }, [store]);
+
 
     function addtoSale(item){
         const itemexist = cart.findIndex(product => product.id === item.id)
@@ -96,9 +108,31 @@ export function useSale() {
     function clearCart(){
         setCart([])
     }
-    const isEmpty = useMemo( ()=> cart.length ===0, [cart]) 
-    const totalIva = useMemo(() => cart.reduce((total, item) => total + (item.priceIva * item.quantity), 0).toFixed(2), [cart])
-    const totalCart = useMemo(() => cart.reduce((total, item) => total + item.total,0), [cart])
+
+
+    // Subtotal sin IVA
+    const subtotal = useMemo(() => {
+    return cart.reduce((total, item) => total + (item.priceIva * item.quantity), 0);
+    }, [cart]);
+
+    // Subtotal con descuento aplicado
+    const subtotalConDescuento = useMemo(() => {
+    const descuentoValido = descuento > maxDescuento ? 0 : descuento;
+    return subtotal - (subtotal * descuentoValido) / 100;
+    }, [subtotal, descuento, maxDescuento]);
+
+    // IVA (por ejemplo, 16%)
+    const tasaIva = 0.16; // Puedes cambiarlo si es diferente
+
+    // IVA calculado sobre subtotal con descuento
+    const iva = useMemo(() => {
+    return subtotalConDescuento * tasaIva;
+    }, [subtotalConDescuento]);
+
+    // Total final con IVA incluido
+    const totalCart = useMemo(() => {
+    return subtotalConDescuento + iva;
+    }, [subtotalConDescuento, iva]);
 
     async function updateSale(storeId, clienteId, sale){
         try {
@@ -136,7 +170,7 @@ export function useSale() {
             const payload = {
                 storeId: Number(storeId),
                 cliente: clienteId,
-                total: Number(totalCart),
+                total: Number(totalConDescuento),
                 productos: cart 
             }
 
@@ -233,6 +267,11 @@ export function useSale() {
 
     return {
         cart,
+        descuento,
+        subtotalConDescuento,
+        iva,
+        setStore,
+        setDescuento,
         setCart,
         updateSale,
         validateQuantity,
@@ -242,8 +281,7 @@ export function useSale() {
         addtoSale,
         finishSale,
         generatePdf,
-        totalIva,
-        isEmpty,
+        subtotal,
         totalCart
     }
 }

@@ -11,7 +11,7 @@ export default function Cargando() {
   const {idStore} = useParams();
   const [store, setStore] = useState([]);
 
-  useEffect(() => {async function fetchStores(){1
+  useEffect(() => {async function fetchStores(){
     const toastId = toast.loading("Cargando tienda...");
     try {
       const response = await fetch("/api/" + idStore);

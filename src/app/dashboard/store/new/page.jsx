@@ -26,11 +26,13 @@ export default function newStore() {
               return res.json();
           })
           .then((data) => {
+            console.log(data);
             setLogo(data.logo),
             setValue("name", data.name),
             setValue("email", data.email),
             setValue("phone",data.phone),
             setValue("address",data.address)
+            setValue("descuento",data.descuento)
           })
           .catch(error => console.error("Error al obtener el producto:", error));
       }
@@ -38,7 +40,11 @@ export default function newStore() {
 
   const onSubmit = handleSubmit(async (data) => {
     const toastId = toast.loading("Creando negocio...");
-    
+    if(data.descuento > 70 || data.descuento < 10){
+      toast.error("El descuento debe estar entre 10% y 70%", { id: toastId });
+      return;
+    }
+
     let uploadedImageUrl = logo;
     try {
       if (file && file.name) {
@@ -55,12 +61,14 @@ export default function newStore() {
         uploadedImageUrl = cloudinaryData.secure_url;
       }
 
+
       const payload = {
         name: data.name, 
         email: data.email, 
         phone: data.phone, 
         address: data.address,
         logo: uploadedImageUrl,
+        descuento: data.descuento ? Number(data.descuento) : 70,
         storeId: Number(params.idStore),
       };
       console.log("payload", payload);
@@ -91,11 +99,15 @@ export default function newStore() {
         <input id="email" type="text" className={`border rounded-md p-1 mb-4 w-full text-black ${errors.email ? "border-red-400 border-2": "border-gray-500"}`} placeholder="example1@gmail.com" {...(register("email", {required: true,} ))}/>
 
         <label htmlFor="phone">Telefono de la tienda</label>
-        <input type="text" name="phone" id="phone" placeholder='Telefono de la tienda' className={`border rounded-md p-1 mb-4 ${errors.phone ? "border-red-400 border-2": "border-gray-500"}`} {...(register("phone", {required: true,} ))}/>
+        <input type="number" name="phone" id="phone" placeholder='Telefono de la tienda' className={`border rounded-md p-1 mb-4 ${errors.phone ? "border-red-400 border-2": "border-gray-500"}`} {...(register("phone", {required: true,} ))}/>
         
         <label htmlFor="address">Direccion de la tienda</label>
         <input type="text" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.address ? "border-red-400 border-2": "border-gray-500"}`} {...(register("address", {required: true,} ))}/>
         
+        <label htmlFor="address">% Descuento maximo permitido (10% - 70%)</label>
+        <input type="number" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.descuento ? "border-red-400 border-2": "border-gray-500"}`} {...(register("descuento"))}/>
+        <p className="text-sm text-gray-600 italic mb-4">Nota: En caso de no proporcionar un descuento se establecera un maximo de 70%</p>
+      
         <ImagenLogo register={register} setValue={setValue} defaultValue={logo} errors={errors} setFile={setFile}/>
         
         <button type='submit' className='bg-slate-900 text-white rounded-lg p-2'>{params.idStore ? "Actualizar tienda" : "Crear tienda"}</button>
@@ -103,6 +115,5 @@ export default function newStore() {
       <Toaster position="top-right" reverseOrder={false} />
     </div>
   )
-  /*<label htmlFor="logo">Logo de la tienda</label>
-        <input type="file" name="logo" id="logo" accept="image/*" placeholder='Logo de la tienda' className={`border rounded-md p-1 mb-4 ${errors.logo ? "border-red-400 border-2": "border-gray-500"}`} {...(register("logo", {required: true,} ))}/>*/ 
+
 }

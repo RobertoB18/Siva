@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function GET(request, {params}){
+  
   const session = await getServerSession(authOptions);
   const {store} = params;
   console.log("Este es el id user " + session.user.id);
@@ -19,11 +20,11 @@ export async function GET(request, {params}){
               }
             }
       });
-      console.log("Esta es la tienda "+ searchStore);
+      console.log(searchStore);
       return NextResponse.json(searchStore);
   } catch (error) {
       console.log("Valio vrg scooby "+ error);
-      return NextResponse.json({ error: "Acceso denegado a esta tienda" }, { status: 403 });
+      return NextResponse.json([], { status: 403 });
   }
 }
 
@@ -46,7 +47,7 @@ export async function PUT(request, {params}){
               ...(dataUpdate.rfc && { rfc: dataUpdate.rfc }),
               ...(dataUpdate.key && { rfc: dataUpdate.keu }),
               ...(dataUpdate.cer && { rfc: dataUpdate.cer }),
-
+              ...(dataUpdate.descuento && { descuento: dataUpdate.descuento }),
           } 
       });
       console.log("Esta es la tienda "+ searchStore);

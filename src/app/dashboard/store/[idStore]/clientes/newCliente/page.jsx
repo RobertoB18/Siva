@@ -63,13 +63,17 @@ export default function NewCliente() {
   const onSubmit = handleSubmit(async (data) => { 
     const toastId = toast.loading("Registrando...");
 
-    if (data.phone.length < 10) {
+    if (data.phone.length !== 10) {
       toast.error("El numero telefonico debe ser de 10 digitos", { id: toastId });
       return;
     }
     const regexRFC = /^[A-ZÑ&]{3,4}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z\d]{2}[A\d]$/;
     if (!regexRFC.test(data.rfc)) {
       toast.error("El RFC es invalido", { id: toastId });
+      return;
+    }
+    if(data.address.length !== 5){
+      toast.error("El codigo postal debe ser de 5 digitos", { id: toastId });
       return;
     }
  
@@ -132,7 +136,12 @@ export default function NewCliente() {
               <p className="text-sm text-gray-600 italic mb-4">Nota: Este nombre sera por el cual lo reconoceras y no por el que se facturara</p>
 
               <label htmlFor="rfc"><span>RFC Cliente</span>
-              <input id="rfc" type="text" {...register("rfc", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.rfc ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="SAMNXXXXXXXXX" />
+              <input id="rfc" type="text" {...register("rfc", { required: true })} 
+                onBlur={(e) => {
+                const upper = e.target.value.toUpperCase(); // Convierte a mayúsculas
+                setValue("rfc", upper); // Actualiza el valor en el formulario
+                }} 
+              className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.rfc ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="SAMNXXXXXXXXX" />
               
               <label htmlFor="razon">Razon social</label>
               <input id="razon" type="text" {...register("razon", {required: true})} className={`border mb-4 p-2 w-full text-black rounded-lg ${errors.razon ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="Coca Cola"/>
@@ -148,7 +157,7 @@ export default function NewCliente() {
               <input id="email" type="text" {...register("email", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.email ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="example1@gmail.com" />
               
               <label htmlFor="address">Codigo Postal</label>
-              <input id="address" type="text" {...register("address", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.address ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="45500"/>
+              <input id="address" type="number" {...register("address", { required: true })} className={`border p-2 mb-4 w-full text-black rounded-lg ${errors.address ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="45500"/>
  
               <label htmlFor="status" className="flex items-center gap-2 mb-4">
                 <span className="text-sm font-medium">Habilitado:</span>

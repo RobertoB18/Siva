@@ -1,4 +1,5 @@
 import {prisma} from "@/libs/prisma";
+import { stat } from "fs";
 import { NextResponse } from "next/server";
   
 export async function GET(request, {params}){
@@ -61,7 +62,15 @@ export async function POST(request){
           storeId: createProduct.storeId
         }
       });
-      if (existe) throw new Error("El producto ya existe en la tienda");
+      if (existe) return NextResponse.json({error: "El producto ya existe"}, {status: 500});
+        const codeBar = await prisma.products.findFirst({
+          where: {
+            codeBar: createProduct.codeBar,
+            storeId: createProduct.storeId
+          }
+        });
+        console.log(codeBar);
+      if (codeBar.codeBar) return NextResponse.json({error: "El codigo de barras ya existe", existingProductId: codeBar.id,}, {status: 500});
       
       const crear = await prisma.products.create({
         data: {
@@ -85,7 +94,6 @@ export async function POST(request){
       return NextResponse.json(crear);
     } catch (error) {
       console.log(error)
-      return NextResponse.json({error: "Error al crear el producto"}, {status:500});
+      return NextResponse.json({error: error.message || "Error al crear producto"}, {status: 500});
     }
-    
 }

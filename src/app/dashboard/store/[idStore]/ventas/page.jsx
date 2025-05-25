@@ -4,14 +4,17 @@ import WatchSales from "@/components/WatchSales";
 import { useStore } from "@/Context/newStoreContext";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {useRouter } from 'next/navigation'
 
 export const dynamic = "force-dynamic";
 
 export default function Ventas() {
-
+  const router = useRouter()
   const { selectedStore } = useStore();
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
+  const [sale, setSale] = useState("");
+  const [tipe, setTipe] = useState(false);
 
   useEffect(() => {
     const toastId = toast.loading("Cargando...")
@@ -41,7 +44,7 @@ export default function Ventas() {
       <div className="flex flex-col items-start ms-16 mt-6 w-3/4 h-auto">
         <input type="text" placeholder="Buscar venta" className="border border-gray-300 w-full rounded-lg p-2" onChange={(e) => setSearch(e.target.value)} />
         <div className="mt-2 flex gap-4">
-          <Link href="./ventas/newVenta " className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Nueva Venta</Link>
+          <button onClick={() => setTipe(true)} className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+ Nueva Venta</button>
           <Link href="./ventas/cotizacion " className="flex items-center justify-center bg-green-700 text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-green-600">+ Generar Cotizacion</Link>
         </div>
       </div>
@@ -60,6 +63,33 @@ export default function Ventas() {
               <WatchSales sale={ventas} key={ventas.id}/>
             ))
           }
+          {tipe && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 className="text-xl font-bold mb-4">Tipo de venta</h2>
+                <p>Selecciona si quieres hacer una venta para mayoristas o normal</p>
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                    onClick={() => router.push(`/dashboard/store/${selectedStore}/ventas/newMayor`)}
+                  >
+                    Venta Mayoreo
+                  </button>
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      router.push(`/dashboard/store/${selectedStore}/ventas/newVenta`)
+                   }}
+                  >
+                    Venta Normal
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         </table>
       </div>
     </div>

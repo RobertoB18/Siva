@@ -62,6 +62,7 @@ export async function POST(request, {params}){
               "phone": newStore.phone,
               "address": newStore.address,
               "logo": newStore.logo,
+              "descuento": newStore.descuento,
           }
       })
       console.log(crearStore);

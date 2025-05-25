@@ -31,6 +31,7 @@ model store{
   logo String?
   key String?
   cer String? 
+  descuento Int? @default(70)
   
   user StoreUser[]
   clientes  clientes[]
@@ -57,6 +58,8 @@ model Sale {
   clienteId Int ?  // cliente id
   productos Json
   date     DateTime @default(now())
+  subtotal Float @default(0)
+  descuento Int? @default(0)
   total    Float
   status Boolean @default(false)
   

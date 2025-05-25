@@ -10,7 +10,7 @@ import AsyncSelect from 'react-select/async'
 import BarcodeScannerPage from '@/components/ScanCode'
 
 export default function NewProduct() {
-  const { register, handleSubmit, setValue, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors }, watch, reset } = useForm();
   const params = useParams();
   const router = useRouter();
   const { selectedStore } = useStore();
@@ -18,6 +18,9 @@ export default function NewProduct() {
   const [loadCodeBar, setLoadCodeBar] = useState(null);
   const [selectedUnidad, setSelectedUnidad] = useState(null);
   const [mode, setMode] = useState("none");
+  const [show, setShow] = useState(false);
+  const [piezas, setPiezas] = useState(false);
+  const [tempData, setTempData] = useState(null);
   
   const priceCost = watch("priceCost");
 
@@ -116,7 +119,7 @@ export default function NewProduct() {
       codesat: data.codesat,
       priceMay: Number(data.priceMay),
       mayQuantity: Number(data.mayQuantity),
-      codeBar: data.codeBar,
+      codeBar: data.codeBar || loadCodeBar,
     };
     //console.log("Payload:", payload);
 
@@ -128,22 +131,63 @@ export default function NewProduct() {
           body: JSON.stringify(payload),
         });
         toast.success("Producto actualizado", { id: toastId });
+        router.refresh();
+        router.push("../compras/newCompra");
       } else {
         const res = await fetch('/api/productos', {
           method: 'POST',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if(!res.ok) throw new Error("Error al crear el producto");
+        const data = await res.json();
+        if(!res.ok) {
+          toast.error(data.error, { id: toastId });
+          if(data.existingProductId) {
+
+            setTimeout(() => {
+              const confirmRedirect = window.confirm("¿Deseas ir al producto existente?");
+              if (confirmRedirect) {
+                router.push(`../almacen/${data.existingProductId}`);
+              }
+            return;
+            }, 2000);
+          }
+          return;
+        }
         toast.success("Producto creado", { id: toastId });
+        if (payload.unity.toLowerCase().includes("paquete")) {
+          setTempData(data); // Guardamos los datos actuales
+          setShow(true); // Mostramos el modal
+        }
+        else{
+          router.refresh();
+          router.push("../compras/newCompra");
+        }
       }
-      router.refresh();
-      router.push("../compras/newCompra");
     } catch (e) {
-        toast.error("Error al guardar el producto", { id: toastId });
-        console.error("Error:", e);
+        toast.error("Error al crear al cliente", { id: toastId });
     }
   });
+
+  const handleCrearPorPieza = () => {
+    const nuevoProducto = {
+      ...tempData,
+      name: `${tempData.name} (pieza)`, // Opcional
+      stock: 0,
+      stockMin: 0,
+      codeBar: "",
+    };
+    setLoadCodeBar(null);
+    setMode("none")
+    setSelectedUnidad({label: "Pieza", value: "H87", unidad: "Pieza"});
+    reset(nuevoProducto); // Cargamos los datos en el formulario
+    setShow(false);
+  };
+
+  const handleNoCrearPorPieza = () => {
+    setShow(false);
+    router.push("/productos");
+  };
 
   return (
     <>
@@ -165,11 +209,11 @@ export default function NewProduct() {
               <div className='flex flex-grow w-full'>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="stockMin">Cantidad minima</label>
-                  <input id="stockMin" type="number" {...register("stockMin", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.stockMin ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1" />
+                  <input id="stockMin" type="number" {...register("stockMin", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.stockMin ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1"  disabled={tempData}/>
                 </div>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="stock">Cantidad</label>
-                  <input id="stock" type="number" {...register("stock", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.stock ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1" disabled={!!params.idProduct} />
+                  <input id="stock" type="number" {...register("stock", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.stock ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1" disabled={!!params.idProduct || tempData} />
                 </div>
               </div>
 
@@ -247,8 +291,7 @@ export default function NewProduct() {
                   />
                 </div>
               )}
-              
-            </div>
+              </div>
             
           </div>
 
@@ -265,6 +308,17 @@ export default function NewProduct() {
             )}
           </div>
         </form>
+           {show && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded shadow-md w-[300px]">
+                <h2 className="text-lg font-semibold mb-4">¿Crear producto por pieza?</h2>
+                <div className="flex justify-end gap-4">
+                  <button onClick={handleCrearPorPieza} className="bg-blue-600 text-white px-4 py-2 rounded">Sí</button>
+                  <button onClick={handleNoCrearPorPieza} className="bg-gray-400 text-white px-4 py-2 rounded">No</button>
+                </div>
+              </div>
+            </div>
+          )}
       </div>
     </>
   );

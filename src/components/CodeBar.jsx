@@ -9,14 +9,16 @@ function aleatorioNum(){
 export default function CodeBar({ register, setValue, defaultValue }) {
     const svg = useRef(null);
     const [code, setCode] = useState("");
-    const [mode, setMode] = useState("none");
 
     const nuevoCodigo = () => {
         const nuevo = aleatorioNum();
         setCode(nuevo);
         setValue("codeBar", nuevo); // ← Aquí actualizamos el formulario
     }
-
+    const cancelar = () => {
+      setCode("");
+      setValue("codeBar", ""); // ← Aquí actualizamos el formulario
+    }
     useEffect(() => {
         if (svg.current && code) {
           JsBarcode(svg.current, code, {
@@ -45,6 +47,8 @@ export default function CodeBar({ register, setValue, defaultValue }) {
               <button type='button' onClick={nuevoCodigo} className='bg-blue-500 rounded-md text-white w-1/3 hover:bg-blue-700 mt-4'>
                 Generar código
               </button>
+              <button type='button' className="ms-5 bg-red-500 rounded-md text-white w-1/3 hover:bg-red-700 mt-4" onClick={cancelar}>Cancelar codigo</button>
+            
             </div>
 
             {/* Campo oculto para enviar el código de barras */}
