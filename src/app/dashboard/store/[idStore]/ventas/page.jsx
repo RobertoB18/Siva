@@ -4,7 +4,8 @@ import WatchSales from "@/components/WatchSales";
 import { useStore } from "@/Context/newStoreContext";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import {useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useSession } from "next-auth/react"
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,30 @@ export default function Ventas() {
   const [search, setSearch] = useState("")
   const [sale, setSale] = useState("");
   const [tipe, setTipe] = useState(false);
+  const [access, setAccess] = useState(false)
+
+  const { data: session, status } = useSession()
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        if(!session || !selectedStore) return;
+        const response = await fetch(`/api/userPermisos?idStore=${selectedStore}&idUser=${session.user.id}`);
+        if (!response.ok) throw new Error("Error al verificar acceso");
+        const data = await response.json();
+        console.log("Permisos del usuario:", data.permissions);
+        if (data.permissions.includes("Ventas") || data.permissions.includes("Administrador") || data.permissions.includes("Empleado")) {
+          setAccess(true);
+        } else {
+          toast.error("No tienes acceso a vender en esta tienda");
+          router.push(`/dashboard/store/${selectedStore}/inicio`);
+        }
+      } catch (error) {
+        console.error("Error al verificar acceso:", error);
+      }
+    };
+    checkAccess();
+  }, [session, selectedStore]);
 
   useEffect(() => {
     const toastId = toast.loading("Cargando...")
@@ -38,7 +63,14 @@ export default function Ventas() {
   }
   );
 
-
+  
+  if(access === false) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-2xl">Cargando...</p>
+      </div>
+    )
+  }
   return (
     <div>
       <div className="flex flex-col items-start ms-16 mt-6 w-3/4 h-auto">
@@ -52,7 +84,6 @@ export default function Ventas() {
         <table className="table-auto border-collapse border border-gray-300 w-full h-7">
           <thead>
             <tr className="bg-black text-white">
-              <th className="border border-gray-300 px-4 py-2">Id</th>
               <th className="border border-gray-300 px-4 py-2">Fecha</th>
               <th className="border border-gray-300 px-4 py-2">Total</th>
               <th className="border border-gray-300 px-4 py-2">Cliente</th>

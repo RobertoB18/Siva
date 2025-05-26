@@ -4,6 +4,8 @@ import WacthBuys from "@/components/WhatchBuys";
 import { useStore } from "@/Context/newStoreContext";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation'
+import { useSession } from "next-auth/react"
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,32 @@ export default function compras() {
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
 
+  const [access, setAccess] = useState(false)
+
+  const { data: session, status } = useSession()
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        if(!session || !selectedStore) return;
+        const response = await fetch(`/api/userPermisos?idStore=${selectedStore}&idUser=${session.user.id}`);
+        if (!response.ok) throw new Error("Error al verificar acceso");
+        const data = await response.json();
+        console.log("Permisos del usuario:", data.permissions);
+        if (data.permissions.includes("Compras") || data.permissions.includes("Administrador") || data.permissions.includes("Empleado")) {
+          setAccess(true);
+        } else {
+          toast.error("No tienes acceso al registra compas en esta tienda");
+          router.push(`/dashboard/store/${selectedStore}/inicio`);
+        }
+      } catch (error) {
+        console.error("Error al verificar acceso:", error);
+      }
+    };
+    checkAccess();
+  }, [session, selectedStore]);
+  
   useEffect(() => {
     const toastId = toast.loading("Cargando...")
     const productos = async () => {
@@ -34,6 +62,14 @@ export default function compras() {
     return compra.provider?.name?.toLowerCase().includes(search.toLowerCase())
   }
   );
+  
+  if(access === false) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-2xl">Cargando...</p>
+      </div>
+    )
+  }
 
   return (
     <div>

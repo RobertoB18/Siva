@@ -19,7 +19,7 @@ export default function NewProduct() {
   const [selectedUnidad, setSelectedUnidad] = useState(null);
   const [mode, setMode] = useState("none");
   const [show, setShow] = useState(false);
-  const [piezas, setPiezas] = useState(false);
+  const [pieza, setPieza] = useState(false);
   const [tempData, setTempData] = useState(null);
   
   const priceCost = watch("priceCost");
@@ -73,6 +73,11 @@ export default function NewProduct() {
   };
 
   const handleUnidadChange = (selectedOption) => {
+    if(selectedOption.label.toLowerCase().includes("paquete")){
+      setPieza(true);
+      console.log(selectedOption.label)
+    }
+    console.log(selectedOption);
     setSelectedUnidad(selectedOption);
   }
 
@@ -93,6 +98,12 @@ export default function NewProduct() {
     }
   }
 
+  function tieneGananciaBaja(price, cost) {
+    if (!cost || cost <= 0) return false;
+    const ganancia = ((price - cost) / cost) * 100;
+    return ganancia < 20;
+  }
+
   const onSubmit = handleSubmit(async (data) => {
     const toastId = toast.loading("Guardando...");
 
@@ -104,7 +115,7 @@ export default function NewProduct() {
       toast.error("El codigo SAT debe tener 8 digitos", { id: toastId });
       return;
     }
-      
+
     const payload = {
       name: data.name,
       storeId: Number(selectedStore),
@@ -120,8 +131,21 @@ export default function NewProduct() {
       priceMay: Number(data.priceMay),
       mayQuantity: Number(data.mayQuantity),
       codeBar: data.codeBar || loadCodeBar,
+      unitsPerPackage: data.unitsPerPackage,
     };
-    //console.log("Payload:", payload);
+
+    const gananciaMenudeoBaja = tieneGananciaBaja(payload.priceMen, payload.priceCost);
+    const gananciaMayoreoBaja = tieneGananciaBaja(payload.priceMay, payload.priceCost);
+    
+    if (gananciaMenudeoBaja || gananciaMayoreoBaja) {
+      const confirmar = window.confirm(
+        "El precio de mayoreo o menudeo tiene menos del 20% de ganancia. ¿Deseas continuar?"
+      );
+      if (!confirmar) {
+        toast.dismiss(toastId);
+        return;
+      }
+    }
 
     try {
       if (params.idProduct) {
@@ -165,7 +189,7 @@ export default function NewProduct() {
         }
       }
     } catch (e) {
-        toast.error("Error al crear al cliente", { id: toastId });
+        toast.error("Error al crear el pedido", { id: toastId });
     }
   });
 
@@ -173,10 +197,11 @@ export default function NewProduct() {
     const nuevoProducto = {
       ...tempData,
       name: `${tempData.name} (pieza)`, // Opcional
-      stock: 0,
+      stock: tempData.unitsPerPackage,
       stockMin: 0,
       codeBar: "",
     };
+    setPieza(false)
     setLoadCodeBar(null);
     setMode("none")
     setSelectedUnidad({label: "Pieza", value: "H87", unidad: "Pieza"});
@@ -231,7 +256,7 @@ export default function NewProduct() {
               
               <label htmlFor="precioMen">Precio</label>
               <br />
-              <input id="precioMen" type="number" {...register("priceMen", { required: true })} className={`border p-2 mb-4 w-2/5 text-black rounded-lg ${errors.priceMen ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="$15" />
+              <input id="precioMen" type="number" step="0.01" {...register("priceMen", { required: true })} className={`border p-2 mb-4 w-2/5 text-black rounded-lg ${errors.priceMen ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="$15" />
 
               <div className='flex flex-grow w-full'>
                 <div className="flex flex-col w-1/2">
@@ -243,9 +268,26 @@ export default function NewProduct() {
                   <input id="codesat" type="number" {...register("codesat", { required: true })} className={`border p-2 mb-4 w-2/5 text-black rounded-lg ${errors.codesat ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="12345678" />
                 </div>
               </div>
-              
-              <label htmlFor="status">Habilitado: </label>
-              <input id="status" type="checkbox" {...register("status")} className="border border-gray-500 p-2 mb-4 w-2/5 text-black rounded-lg" defaultChecked />
+              {pieza && (
+                <label htmlFor="unitsPerPackage">Unidades por paquete
+                  <input className={`border p-2 mb-4 w-2/5 text-black rounded-lg ${errors.unitsPerPackage ? "border-red-400 border-2" : "border-gray-500"}`}
+                    {...register("unitsPerPackage", {
+                      required: "Este campo es obligatorio si hay paquete",
+                      min: 1,
+                      valueAsNumber: true,
+                    })}
+                  />
+                </label>
+                
+              )}
+              <label htmlFor="status" className="flex items-center gap-2 mb-4">
+                <span className="text-sm font-medium">Habilitado:</span>
+                <div className="relative inline-block w-12 h-6">
+                  <input id="status" type="checkbox" {...register("status")} defaultChecked className="peer sr-only"/>
+                  <div className="w-full h-full hover:cursor-pointer bg-gray-300 rounded-full peer-checked:bg-green-500 transition-colors duration-300"></div>
+                  <div className="absolute left-0 top-0 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 peer-checked:translate-x-6"></div>
+                </div>
+              </label>
             </div>
 
             <div className="w-1/2 m-4 border-s-2 border-gray-500 p-5">

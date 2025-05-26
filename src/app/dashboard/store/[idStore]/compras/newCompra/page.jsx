@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useStore } from '@/Context/newStoreContext'
-import CodeBar from '@/components/CodeBar'
 import AsyncSelect from 'react-select/async'
 import { useBuys } from '@/app/Hooks/useBuys'
 

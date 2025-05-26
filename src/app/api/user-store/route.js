@@ -70,7 +70,7 @@ export async function POST(request, {params}){
           data:{
               "storeId": crearStore.id,
               "userId": session.user.id,
-              "permissions": ["admin"],
+              "permissions": ["Administrador"],
           }
       })
       console.log(storeRef);

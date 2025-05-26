@@ -10,9 +10,8 @@ export default function WacthBuys({sale}) {
   return (
     <tbody>
         <tr>
-            <td className="border border-gray-300 px-4 py-2 ">{sale.id}</td>
             <td className="border border-gray-300 px-4 py-2 ">{fechaLocal}</td>
-            <td className="border border-gray-300 px-4 py-2">$ {sale.total}</td>
+            <td className="border border-gray-300 px-4 py-2">$ {sale.total.toFixed(2)}</td>
             <td className="border border-gray-300 px-4 py-2">{sale.clientes?.name || "Sin cliente"}</td>
             <td className='border border-gray-300 px-4 py-2 items-center justify-center flex'>
               <Link href={"./ventas/"+sale.id}>

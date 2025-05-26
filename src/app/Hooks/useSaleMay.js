@@ -139,7 +139,9 @@ export function useSaleMay() {
                 storeId: Number(storeId),
                 cliente: clienteId,
                 total: Number(totalCart),
-                productos: cart 
+                productos: cart,
+                subtotal: Number(subtotalConDescuento),
+                descuento: Number(descuento),
             }
 
             const response = await fetch("/api/sales", {

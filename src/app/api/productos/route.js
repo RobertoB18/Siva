@@ -88,6 +88,7 @@ export async function POST(request){
             "codeBar": createProduct.codeBar,
             "priceMay": createProduct.priceMay,
             "mayQuantity": createProduct.mayQuantity,
+            "unitsPerPackage": createProduct.unitsPerPackage,
         }
       })
       //console.log(crear);

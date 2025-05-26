@@ -141,6 +141,8 @@ export function useSale() {
                 cliente: clienteId,
                 total: Number(totalCart),
                 productos: cart, 
+                subtotal: Number(subtotalConDescuento),
+                descuento: Number(descuento),
             }
 
             console.log(payload)
@@ -170,8 +172,10 @@ export function useSale() {
             const payload = {
                 storeId: Number(storeId),
                 cliente: clienteId,
-                total: Number(totalConDescuento),
-                productos: cart 
+                total: Number(totalCart),
+                productos: cart,
+                subtotal: Number(subtotalConDescuento),
+                descuento: Number(descuento),
             }
 
             const response = await fetch("/api/sales", {
@@ -242,19 +246,19 @@ export function useSale() {
             });
 
             const finalY = doc.lastAutoTable.finalY + 10;
-
             // --- Subtotal y total ---
             doc.setFontSize(12);
-            doc.text(`Subtotal: $${totalIva}`, 140, finalY);
-            doc.text(`Total: $${totalCart.toFixed(2)}`, 140, finalY + 6);
+            doc.text(`Subtotal: $${subtotalConDescuento.toFixed(2)}`, 140, finalY);
+            doc.text(`Descuento: ${descuento.toFixed(2)}%`, 140, finalY + 6);
+            doc.text(`IVA: $${iva.toFixed(2)}`, 140, finalY + 12);
+            doc.text(`Total: $${totalCart.toFixed(2)}`, 140, finalY + 18);
 
             // --- Pie de página ---
             doc.setFontSize(10);
             doc.setTextColor(100);
             doc.text("Gracias por su preferencia.", 14, 285);
-            //doc.text("Esta cotización es válida por 5 días hábiles.", 14, 290);
+            doc.text("Este documento es una cotización y no es válido como factura.", 14, 290);
 
-            // --- Guardar PDF ---
             doc.save("Cotizacion.pdf");
     
         } catch (error) {

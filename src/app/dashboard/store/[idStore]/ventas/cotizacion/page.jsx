@@ -10,7 +10,7 @@ import { useSale } from '@/app/Hooks/useSale'
 
 export default function () {
   const { selectedStore } = useStore();
-  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, generatePdf, cart, totalCart, totalIva} = useSale()
+  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, generatePdf, cart, iva, totalCart, subtotal, subtotalConDescuento, descuento, setDescuento} = useSale()
   const router = useRouter()
 
   const [showConfirm, setShowConfirm] = useState(false)
@@ -126,8 +126,25 @@ export default function () {
               }
             </tbody>
           </table>
-          <p className='text-xl mt-6'>Sub-Total: ${totalIva}</p>
-          <p className='text-xl mt-6'>Total: ${totalCart}</p>
+           <div className="flex flex-col justify-end items-end w-full">
+              <div className='grid grid-cols-2 gap-2 mt-5 w-full max-w-sm'>              
+              <p className="text-right">Subtotal:</p>
+              <p className="text-left">${subtotal.toFixed(2)}</p>
+
+              <label className="text-right font-bold" htmlFor="descuento">Descuento: </label>
+              <input id='descuento' className='"border rounded-md w-10 px-2' type="number" placeholder='10%' value={descuento} onChange={(e) => setDescuento(Number(e.target.value))} />
+            
+              <p className="text-right">Subtotal con descuento:</p>
+                <p className="text-left">${subtotalConDescuento.toFixed(2)}</p>
+
+                <p className="text-right">IVA (16%):</p>
+                <p className="text-left">${iva.toFixed(2)}</p>
+
+                <p className="text-right font-bold text-xl col-span-1">Total con IVA:</p>
+                <p className="text-left font-bold text-xl col-span-1">${totalCart.toFixed(2)}</p>
+
+            </div>
+          </div>
         </div>
         
         <div className="flex justify-between px-5 mt-2 w-3/4">

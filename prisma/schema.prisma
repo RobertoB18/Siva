@@ -96,9 +96,11 @@ model products{
   description String
   status Boolean
   codesat String
+  unitsPerPackage Int? @default(0)
   priceMay Int?
   mayQuantity Int?
   codeBar String? 
+
   store store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
