@@ -50,7 +50,7 @@ export async function POST(request, {params}){
             data: {
                 userId: searchUser.id,
                 storeId: Number(newUserStore.storeId),
-                permissions: ["Empleado"],
+                permissions: ["Ventas", "Compras", "Almacen", "Contabilidad"],
             }
         });
         console.log("Esta es la tienda "+ crearStore);

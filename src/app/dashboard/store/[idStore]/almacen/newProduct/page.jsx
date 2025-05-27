@@ -99,7 +99,7 @@ export default function NewProduct() {
   }
 
   function tieneGananciaBaja(price, cost) {
-    if (!cost || cost <= 0) return false;
+    if (!cost || cost <= 0 || !price) return false;
     const ganancia = ((price - cost) / cost) * 100;
     return ganancia < 20;
   }
@@ -130,13 +130,15 @@ export default function NewProduct() {
       codesat: data.codesat,
       priceMay: Number(data.priceMay),
       mayQuantity: Number(data.mayQuantity),
-      codeBar: data.codeBar || loadCodeBar,
+      codeBar: data.codeBar,
       unitsPerPackage: data.unitsPerPackage,
     };
 
     const gananciaMenudeoBaja = tieneGananciaBaja(payload.priceMen, payload.priceCost);
     const gananciaMayoreoBaja = tieneGananciaBaja(payload.priceMay, payload.priceCost);
     
+    console.log(gananciaMayoreoBaja)
+    console.log(gananciaMenudeoBaja)
     if (gananciaMenudeoBaja || gananciaMayoreoBaja) {
       const confirmar = window.confirm(
         "El precio de mayoreo o menudeo tiene menos del 20% de ganancia. ¿Deseas continuar?"
@@ -149,11 +151,26 @@ export default function NewProduct() {
 
     try {
       if (params.idProduct) {
-        await fetch(`/api/productos/${params.idProduct}`, {
+        const res = await fetch(`/api/productos/${params.idProduct}`, {
           method: 'PUT',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+        const data = await res.json();
+        if(!res.ok) {
+          toast.error(data.error, { id: toastId });
+          if(data.existingProductId) {
+
+            setTimeout(() => {
+              const confirmRedirect = window.confirm("¿Deseas ir al producto existente?");
+              if (confirmRedirect) {
+                router.push(`../almacen/${data.existingProductId}`);
+              }
+            return;
+            }, 2000);
+          }
+          return;
+        }
         toast.success("Producto actualizado", { id: toastId });
         router.refresh();
         router.push("../compras/newCompra");
@@ -188,6 +205,7 @@ export default function NewProduct() {
           router.push("../compras/newCompra");
         }
       }
+      
     } catch (e) {
         toast.error("Error al crear el pedido", { id: toastId });
     }
@@ -199,6 +217,10 @@ export default function NewProduct() {
       name: `${tempData.name} (pieza)`, // Opcional
       stock: tempData.unitsPerPackage,
       stockMin: 0,
+      priceCost: tempData.priceCost / tempData.unitsPerPackage,
+      priceMen: "",
+      priceMay: "",
+      mayQuantity: "",
       codeBar: "",
     };
     setPieza(false)
@@ -241,11 +263,13 @@ export default function NewProduct() {
                   <input id="stock" type="number" {...register("stock", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.stock ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="1" disabled={!!params.idProduct || tempData} />
                 </div>
               </div>
+              { 
 
+              }
               <div className='flex flex-grow w-full'>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="priceCost">Precio de compra</label>
-                  <input id="priceCost" type="number" onChange={handleInput1Change} {...register("priceCost", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.priceCost ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="$10" />
+                  <input disabled={tempData} id="priceCost" type="number" onChange={handleInput1Change} {...register("priceCost", { required: true })} className={`border p-2 mb-4 w-4/5 text-black rounded-lg ${errors.priceCost ? "border-red-400 border-2" : "border-gray-500"}`} placeholder="$10" />
                 </div>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="porcent">* Cantidad de ganancia %</label>
@@ -261,7 +285,7 @@ export default function NewProduct() {
               <div className='flex flex-grow w-full'>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="unidad">Unidad de medida</label>
-                  <AsyncSelect id="unity" className='w-4/5' value={selectedUnidad} onChange={handleUnidadChange} loadOptions={options} placeholder="Buscar unidad..." isClearable defaultOptions cacheOptions />
+                  <AsyncSelect isDisabled={tempData} id="unity" className='w-4/5' value={selectedUnidad} onChange={handleUnidadChange} loadOptions={options} placeholder="Buscar unidad..." isClearable defaultOptions cacheOptions />
                 </div>
                 <div className="flex flex-col w-1/2">
                   <label htmlFor="codeBar">Codigo SAT</label>

@@ -63,6 +63,8 @@ export async function POST(request){
         }
       });
       if (existe) return NextResponse.json({error: "El producto ya existe"}, {status: 500});
+      
+      if(createProduct.codeBar){
         const codeBar = await prisma.products.findFirst({
           where: {
             codeBar: createProduct.codeBar,
@@ -70,7 +72,8 @@ export async function POST(request){
           }
         });
         console.log(codeBar);
-      if (codeBar.codeBar) return NextResponse.json({error: "El codigo de barras ya existe", existingProductId: codeBar.id,}, {status: 500});
+        if (codeBar && codeBar.codeBar) return NextResponse.json({error: "El codigo de barras ya existe", existingProductId: codeBar.id,}, {status: 500});  
+      }
       
       const crear = await prisma.products.create({
         data: {

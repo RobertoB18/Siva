@@ -15,7 +15,7 @@ export default function WacthProducts({producto}) {
             <td className="border border-gray-300 px-4 py-2">{producto.mayQuantity}</td>
             <td className='border border-gray-300 px-4 py-2 items-center justify-center flex'>
               <Link href={"./almacen/"+producto.id}>
-                <Image className="hover:border-green-400" src={"/editar.png"} width={30} height={30} alt="Editar" />
+                <Image src={"/editar.png"} width={30} height={30} alt="Editar" />
               </Link>
             </td>
         </tr>
