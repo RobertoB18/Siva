@@ -17,7 +17,7 @@
     "cloudinary": "^2.6.1",
     "crypto": "^1.0.1",
     "emailjs-com": "^3.2.0",
-    "facturapi": "^4.8.1",
+    "facturapi": "^4.8.3",
     "formidable": "^3.5.4",
     "fs": "^0.0.1-security",
     "html5-qrcode": "^2.3.8",

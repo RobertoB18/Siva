@@ -44,9 +44,6 @@ export async function PUT(request, {params}){
               ...(dataUpdate.phone && { phone: dataUpdate.phone }),
               ...(dataUpdate.address && { address: dataUpdate.address }),
               ...(dataUpdate.logo && { logo: dataUpdate.logo }),
-              ...(dataUpdate.rfc && { rfc: dataUpdate.rfc }),
-              ...(dataUpdate.key && { rfc: dataUpdate.keu }),
-              ...(dataUpdate.cer && { rfc: dataUpdate.cer }),
               ...(dataUpdate.descuento && { descuento: dataUpdate.descuento }),
           } 
       });

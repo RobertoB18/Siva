@@ -5,27 +5,39 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const idStore = searchParams.get("idStore");
+    const casse = searchParams.get("casse");
 
     try {
+      if(casse === "1"){
         const ventas = await prisma.Sale.findMany({
-            where:{
-              storeId: Number(idStore)
-            },
-            include: {
-              clientes: {
-                select: {
-                  id: true,
-                  name: true,
-                }
-              }
-            },
-            orderBy: [
-              { date: 'desc' } 
-            ]
-          }
-        );
+          where: {
+            storeId: Number(idStore),
+            status: false
+          },
+          orderBy: [
+            { date: 'desc' } 
+          ]
+        });
         return NextResponse.json(ventas);
-
+      }
+      const ventas = await prisma.Sale.findMany({
+          where:{
+            storeId: Number(idStore)
+          },
+          include: {
+            clientes: {
+              select: {
+                id: true,
+                name: true,
+              }
+            }
+          },
+          orderBy: [
+            { date: 'desc' } 
+          ]
+        }
+      );
+      return NextResponse.json(ventas);
     } catch (error) {
         console.log(error);
         return NextResponse.json([], {status:500});

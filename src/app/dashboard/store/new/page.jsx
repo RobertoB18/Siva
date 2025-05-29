@@ -2,6 +2,7 @@
 import { Tab } from "@headlessui/react";
 import UsuariosConPermisos from "@/components/UserPermisos";
 import AjusteStore from "@/components/AjusteStore";
+import CrearOrganizacion from "@/components/FacturaAjuste";
 import { useRouter, useParams } from 'next/navigation'
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react";
@@ -77,7 +78,7 @@ export default function TabsComponent() {
         {params.idStore && (
           <div>
             <Tab.Panel><UsuariosConPermisos/></Tab.Panel>
-            <Tab.Panel>Contenido de ajustes</Tab.Panel>
+            <Tab.Panel><CrearOrganizacion/></Tab.Panel>
           </div>
         )}
       </Tab.Panels>

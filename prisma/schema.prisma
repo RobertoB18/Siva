@@ -27,10 +27,11 @@ model store{
   address String
   phone String
   email String
-  rfc  String? @db.VarChar(512)
   logo String?
+  idApi String? @unique
+  razonSocial String?
+  regimenFiscal String?
   key String?
-  cer String? 
   descuento Int? @default(70)
   
   user StoreUser[]

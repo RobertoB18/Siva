@@ -54,11 +54,11 @@ export default function NewCliente() {
     return regimenes.filter(regimen => regimen.name.toLowerCase().includes(inputValue.toLowerCase())).map(regimen => ({
       value: regimen.code, // o cualquier identificador único
       label: regimen.name
-    }))};
+  }))};
 
-    const handleChange = (e) => {
-        setRegimen(e)
-    }
+  const handleChange = (e) => {
+      setRegimen(e)
+  }
 
   const onSubmit = handleSubmit(async (data) => { 
     const toastId = toast.loading("Registrando...");

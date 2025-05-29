@@ -2,6 +2,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { prisma } from "@/libs/prisma";
 import { NextResponse } from "next/server";
+import Facturapi from "facturapi";
+
+const facturapi = new Facturapi(process.env.SECRET_KEY_FACTUAPI);
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -55,6 +58,10 @@ export async function POST(request, {params}){
   const session = await getServerSession(authOptions);
   //console.log("Este es el ide de la tienda "+ session.user.email);
   try {
+      const org = await facturapi.organizations.create({
+        name: newStore.name
+      });
+
       const crearStore = await prisma.store.create({
           data: {
               "name": newStore.name,
@@ -63,6 +70,7 @@ export async function POST(request, {params}){
               "address": newStore.address,
               "logo": newStore.logo,
               "descuento": newStore.descuento,
+              "idApi": org.id,
           }
       })
       console.log(crearStore);

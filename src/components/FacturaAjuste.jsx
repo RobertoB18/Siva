@@ -15,6 +15,7 @@ export default function CrearOrganizacion() {
   const [store, setStore] = useState(null);
 
   const [form, setForm] = useState({
+    id:"",
     name: "Roberto",
     legal_name: "",
     zip: "",
@@ -36,11 +37,13 @@ export default function CrearOrganizacion() {
         .then((data) => {
           setStore(data);
           setForm({
+            id: data.id,
             name: data.name,
             legal_name: data.razonSocial,
             email: data.email, 
             zip: data.address,
-            
+            idApi: data.idApi,
+            tax_system: data.regimenFiscal
           })
           if(regimenes.length > 0){
             setRegimen({
@@ -77,6 +80,7 @@ export default function CrearOrganizacion() {
     const name = e.target.name;
     let value = e.target.value;
 
+    // Convertir a mayúsculas solo ciertos campos
     if (["legal_name"].includes(name)) {
       value = value.toUpperCase();
     }
@@ -111,6 +115,7 @@ export default function CrearOrganizacion() {
       const data = await res.json();
       console.log(data);
       if(!res.ok) return toast.error(data.error, {duration: 3000, id: idToast});
+      toast.success(data.message, {id: idToast});
     } catch (error) {
       toast.error("Error al actualizar los datos", {id: idToast})
     }
