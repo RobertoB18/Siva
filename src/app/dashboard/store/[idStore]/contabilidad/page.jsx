@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import WacthProviders from "@/components/WatchProviders";
+import WacthFacturas from "@/components/Facturas";
 import { useStore } from "@/Context/newStoreContext";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ export default function contabilidad() {
         if (!response.ok) throw new Error("Error al verificar acceso");
         const data = await response.json();
         console.log("Permisos del usuario:", data.permissions);
-        if (data.permissions.includes("Contabilidad") || data.permissions.includes("Administrador") || data.permissions.includes("Empleado")) {
+        if (data.permissions.includes("Contabilidad") || data.permissions.includes("Administrador")) {
           setAccess(true);
         } else {
           toast.error("No tienes acceso a contabilidad de esta tienda");
@@ -44,20 +44,20 @@ export default function contabilidad() {
     const toastId = toast.loading("Cargando...")
     const productos = async () => {
       try {
-        const resp = await fetch(`/api/providers?idStore=${selectedStore}`)
+        const resp = await fetch(`/api/factura?idStore=${selectedStore}`)
         const data = await resp.json()
         setData(data)
         console.log(data)
-        toast.success("Proveedores cargados", { id: toastId })
+        toast.success("Facturas cargadas cargados", { id: toastId })
       } catch (error) {
         toast.error("Error al cargar los proveedores", { id: toastId })
       }
     };
     productos()
-  }, [selectedStore])  
+  }, [access])  
 
-  const filteredData = data.filter(provider =>{
-    return provider.name.toLowerCase().includes(search.toLowerCase())
+  const filteredData = data.filter(factura =>{
+    return factura.clientes.name.toLowerCase().includes(search.toLowerCase())
   }
   );
 
@@ -74,6 +74,7 @@ export default function contabilidad() {
         <input type="text" placeholder="Buscar compra" className="border border-gray-300 w-full rounded-lg p-2" onChange={(e) => setSearch(e.target.value)} />
         <div className="mt-2 flex gap-2">
           <Link href="./clientes" className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">Ver Cliente</Link>
+          <Link href="./contabilidad/newFactura" className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+Nueva Factura</Link>
         </div>
       </div>
       <div className="h-screen w-3/4 flex flex-row ms-16 mt-5">
@@ -84,12 +85,12 @@ export default function contabilidad() {
                 <th className="border border-gray-300 px-4 py-2">Nombre</th>
                 <th className="border border-gray-300 px-4 py-2">Telefono</th>
                 <th className="border border-gray-300 px-4 py-2">Correo</th>
-                <th className="border border-gray-300 px-4 py-2">Direccion</th>
+                <th className="border border-gray-300 px-4 py-2">Fecha</th>
                 <th className="border border-gray-300 px-4 py-2">Opciones</th>
             </tr>
           </thead>
-          {filteredData.map(provider => (
-              <WacthProviders provider={provider} key={provider.id}/>
+          {filteredData.map(factura => (
+              <WacthFacturas factura={factura} key={factura.id}/>
             ))
           }
         </table>

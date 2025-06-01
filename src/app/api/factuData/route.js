@@ -15,12 +15,84 @@ function bufferToStream(buffer) {
   stream.end(buffer);
   return stream;
 }
+
 export async function POST(request, {params}){
+  const venta = await request.json();
+  const {clientes, productos} = venta;
+  console.log(productos);
+
   try {
+    const storeData = await prisma.store.findUnique({
+      where:{
+        id: Number(venta.storeId)
+      } 
+    })
+    console.log(storeData.key);
+    const apiKey = new Facturapi(storeData.key);
+
+    const factura = await apiKey.invoices.create({
+      customer:{
+        legal_name: clientes.razonSocial,
+        email:clientes.email,
+        tax_id: clientes.rfc,
+        tax_system: clientes.regimenFiscal,
+        address:{
+          zip:clientes.address,
+        }
+      },
+      items: productos.map(p => ({
+        
+        quantity: p.quantity,
+        product: {
+          description: p.name,
+          product_key: p.product_key, // Asignar clave SAT válida
+          price: p.price
+        }
+      })),
+      payment_form: venta.payment_form,
+      folio_number: venta.id,
+      series: 'F'
+    })
+
+    await prisma.facturas.create({
+      data:{
+        storeId: venta.storeId,
+        idFactura: factura.id,
+        clienteId: clientes.id
+      }
+    })
+
+    await prisma.sale.update({
+      where:{
+        id: venta.id
+      },
+      data:{
+        status: true
+      }
+    })
+
+    const zipStream = await apiKey.invoices.downloadZip(factura.id);
+
+    // Convertimos el stream a buffer
+    const chunks = [];
+    for await (const chunk of zipStream) {
+      chunks.push(chunk);
+    }
+    const zipBuffer = Buffer.concat(chunks);
+
+    // Respondemos con headers para forzar descarga
+    return new NextResponse(zipBuffer, {
+      headers: {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename=factura_${facturaId}.zip`,
+      },
+    });
+
     
+    return NextResponse.json({ message: 'Factura generada correctamente', factura });
   } catch (error) {
-    console.log("Error: "+error);
-    return NextResponse({error: error.message}, {status: 500});
+    console.log("Error: "+ error);
+    return NextResponse.json({ message: 'Factura generada correctamente', factura });
   }
 
 }  

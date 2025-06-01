@@ -200,6 +200,7 @@ export function useSale() {
             }
         }
     }
+
     async function generatePdf(idStore) {
         try {
             const storeInfo = await fetch("/api/"+idStore)
@@ -266,8 +267,6 @@ export function useSale() {
         }
         
     }
-
-
 
     return {
         cart,

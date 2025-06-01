@@ -6,13 +6,24 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const idStore = searchParams.get("idStore");
     const casse = searchParams.get("casse");
+    const client = searchParams.get("client")
+    console.log(`${idStore}, ${casse}, ${client}`)
 
     try {
       if(casse === "1"){
-        const ventas = await prisma.Sale.findMany({
+        const ventas = await prisma.sale.findMany({
           where: {
             storeId: Number(idStore),
-            status: false
+            status: false,
+            clientes: {
+              name: {
+                contains: client,
+                mode: 'insensitive',
+              }
+            }
+          },
+          include: {
+            clientes: true
           },
           orderBy: [
             { date: 'desc' } 

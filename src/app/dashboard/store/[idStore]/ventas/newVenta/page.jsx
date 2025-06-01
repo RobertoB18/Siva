@@ -27,10 +27,17 @@ export default function () {
         .then(res => res.json())
         .then(async data => {
           setCart(data.productos)
+          console.log(data.storeId + "  " + selectedStore)
+          const hola = Number(data.storeId) !== Number(selectedStore)
+          console.log(hola)
+          if(Number(data.storeId) !== Number(selectedStore)){
+            console.log(data);
+            router.push(`../ventas`)
+          }
           const hoy = new Date();
           const fechaVenta = new Date(data.date);
           const mismoMes = fechaVenta.getMonth() === hoy.getMonth() && fechaVenta.getFullYear() === hoy.getFullYear();
-          if(!mismoMes){
+          if(!mismoMes || data.status){
             setValido(false)
           }
           if (Clients) {
@@ -45,7 +52,7 @@ export default function () {
         })
         .catch(error => toast.error("Error al cargar la venta", { id: toastId }));
       }
-    }, [params.idVenta, Clients]);
+    }, [params.idVenta, Clients, selectedStore]);
 
   useEffect(() => {
     setStore(selectedStore)

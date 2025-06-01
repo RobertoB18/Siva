@@ -26,10 +26,10 @@ export default function TabsComponent() {
         if (!response.ok) throw new Error("Error al verificar acceso");
         const data = await response.json();
         console.log("Permisos del usuario:", data.permissions);
-        if (data.permissions.includes("Administrador") || data.permissions.includes("Empleado")) {
+        if (data.permissions.includes("Administrador")) {
           setAccess(true);
         } else {
-          toast.error("No tienes acceso al almacen de esta tienda");
+          toast.error("No tienes acceso a los ajustes de la tienda");
           router.push(`/dashboard/store/${selectedStore}/inicio`);
         }
       } catch (error) {
