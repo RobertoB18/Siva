@@ -49,9 +49,9 @@ export default function compras() {
         const data = await resp.json()
         setData(data)
         console.log(data)
-        toast.success("Productos cargados", { id: toastId })
+        toast.success("Compras cargadas", { id: toastId })
       } catch (error) {
-        toast.error("Error al cargar los productos", { id: toastId })
+        toast.error("Error al cargar las compras", { id: toastId })
       }
     };
     productos()

@@ -28,7 +28,7 @@ export async function GET(request, {params}){
         return NextResponse.json(userPermisos, { status: 200 });
     } catch (error) {
         console.log("Error al obtener permisos del usuario: " + error);
-        return NextResponse.json({ error: "Acceso denegado a este usuario" }, { status: 403 });
+        return NextResponse.json([], { error: "Acceso denegado a este usuario" }, { status: 403 });
     }
 
 }

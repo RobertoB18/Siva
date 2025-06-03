@@ -173,7 +173,7 @@ export default function NewProduct() {
         }
         toast.success("Producto actualizado", { id: toastId });
         router.refresh();
-        router.push("../compras/newCompra");
+        router.push("../almacen");
       } else {
         const res = await fetch('/api/productos', {
           method: 'POST',

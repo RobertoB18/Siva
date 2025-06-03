@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { debounce, times } from 'lodash';
 import { useStore } from '@/Context/newStoreContext';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function NuevaFacturaPage() {
   const {selectedStore} = useStore();
-
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [ventas, setVentas] = useState([]);
   const [filtro, setFiltro] = useState('');
@@ -29,6 +30,7 @@ export default function NuevaFacturaPage() {
         }
         else{
           toast.error("No se han actualizado los datos de facturacion en ajustes")
+          router.push("../contabilidad");
         }
       } 
     }
@@ -78,6 +80,7 @@ export default function NuevaFacturaPage() {
 
       setMensaje(`✅ Factura generada:`);
       setFacturaData(data.factura);
+      router.push(`../contabilidad/${data.factura.folio_number}`);
       setStep(3);
     } catch (err) {
       toast.error(`${err.message}`);

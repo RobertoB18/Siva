@@ -19,7 +19,7 @@ function bufferToStream(buffer) {
 export async function POST(request, {params}){
   const venta = await request.json();
   const {clientes, productos} = venta;
-  console.log(productos);
+  console.log(venta);
 
   try {
     const storeData = await prisma.store.findUnique({
@@ -45,11 +45,11 @@ export async function POST(request, {params}){
         quantity: p.quantity,
         product: {
           description: p.name,
-          product_key: p.product_key, // Asignar clave SAT válida
+          product_key: p.codesat, // Asignar clave SAT válida
           price: p.price
         }
       })),
-      payment_form: venta.payment_form,
+      payment_form: venta.metodoPago,
       folio_number: venta.id,
       series: 'F'
     })
@@ -71,24 +71,10 @@ export async function POST(request, {params}){
       }
     })
 
-    const zipStream = await apiKey.invoices.downloadZip(factura.id);
+    await apiKey.invoices.sendByEmail(factura.id,
+      {email: clientes.email}
+    )
 
-    // Convertimos el stream a buffer
-    const chunks = [];
-    for await (const chunk of zipStream) {
-      chunks.push(chunk);
-    }
-    const zipBuffer = Buffer.concat(chunks);
-
-    // Respondemos con headers para forzar descarga
-    return new NextResponse(zipBuffer, {
-      headers: {
-        'Content-Type': 'application/zip',
-        'Content-Disposition': `attachment; filename=factura_${facturaId}.zip`,
-      },
-    });
-
-    
     return NextResponse.json({ message: 'Factura generada correctamente', factura });
   } catch (error) {
     console.log("Error: "+ error);

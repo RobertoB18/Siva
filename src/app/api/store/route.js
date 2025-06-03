@@ -31,7 +31,7 @@ export async function GET(request, {params}){
       return NextResponse.json(searchStore);
   } catch (error) {
       console.log("Valio vrg scooby "+ error);
-      return NextResponse.json([], { status: 403 });
+      return NextResponse.json([], {error: "No se encontro al usuario", status: 403 });
   }
 }
 

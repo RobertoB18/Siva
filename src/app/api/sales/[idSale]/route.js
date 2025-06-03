@@ -25,10 +25,9 @@ export async function PUT(request, {params}){
             id: Number(params.idSale)
         },
         data: {
-            storeId: dataUpdate.storeId,
             clienteId: dataUpdate.cliente,
-            total: dataUpdate.total,
-            productos: dataUpdate.productos
+            use: dataUpdate.use,
+            metodoPago: dataUpdate.pago
         }
     });
     return NextResponse.json(productUpdate);

@@ -16,6 +16,7 @@ export default function () {
   const [Clients, setClients] = useState(null)
   const [clientSelected, setClientSelected] = useState(null)
   const [mode, setMode] = useState(false)
+  const [factura, setFactura] = useState(false)
 
   useEffect(() => {
     setStore(selectedStore)
@@ -76,20 +77,16 @@ export default function () {
   const finishedSale = async () => {
     const toastId = toast.loading("Finalizando venta...")
     try {
-
-        if(cart.length === 0) return toast.error("No hay productos en el carrito", { id: toastId })
-        const clientId = clientSelected ? Number(clientSelected.id) : null
-        const result = await finishSale(selectedStore, clientId)
-      
-        if(!result.success) return toast.error("Error al finalizar la venta", { id: toastId });
-        toast.success("Venta finalizada", { id: toastId })
-        clearCart()
-      //router.refresh();
-      router.push("../ventas");
+      if(cart.length === 0) return toast.error("No hay productos en el carrito", { id: toastId })
+      const clientId = clientSelected ? Number(clientSelected.id) : null
+      const result = await finishSale(selectedStore, clientId)
+    
+      if(!result.success) return toast.error("Error al finalizar la venta", { id: toastId });
+      toast.success("Venta finalizada", { id: toastId })
+      clearCart()
     } catch (error) {
       console.log(error)
       toast.error("Error al finalizar la venta", { id: toastId })
-      
     }
     
   }
@@ -218,9 +215,45 @@ export default function () {
             )}
           </div>
         </div>
+        {factura && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                <h2 className="text-xl font-bold mb-4">Facturar</h2>
+                <p>Deseas facturar la venta de una vez</p>
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                    onClick={() => {
+                      finishedSale();
+                      router.push(`../ventas`)
+                    }} 
+                  >
+                    No
+                  </button>
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                    onClick={() => {
+                      if(!clientSelected){
+                        toast.error("Selecciona un cliente")
+                        setFactura(false);
+                        return;
+                      }
+                      finishedSale();
+                      router.push(`/dashboard/store/${selectedStore}/contabilidad/newFactura`)
+                   }}
+                  >
+                    Si
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="flex justify-between px-5 mt-2 w-3/4">
-          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={finishedSale}>Finalizar venta</button> 
+          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl"  onClick={() => setFactura(true)}>Finalizar venta</button> 
           <button className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Venta</button>
         </div>
         </div>

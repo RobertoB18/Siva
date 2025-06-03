@@ -79,7 +79,7 @@ export async function PUT(request, {params}){
       console.log(storeData.key);
       const apiKey = new Facturapi(storeData.key);
       await apiKey.invoices.sendByEmail(facturaData.idFactura,
-        {email: "robertobatista18106@gmail.com"}
+        {email: facturaData.email}
       )
       
       return NextResponse.json({status: 200});

@@ -63,12 +63,20 @@ export async function POST(request) {
     const newSale = await prisma.Sale.create({
       data: {
         storeId: createSale.storeId,
-        clienteId: createSale.cliente,
+        clienteId: createSale.cliente ?? null,
         total: createSale.total,
         productos: createSale.productos,
+        subtotal: createSale.subtotal,
+        descuento: createSale.descuento ? createSale.descuento : 0,
+        use: createSale.use ? createSale.use : "",
+        metodoPago: createSale.pago
+      },
+      include: {
+        clientes: true, // Esto incluye la información del cliente relacionado
       },
     });
 
+    console.log(newSale)
     for (const producto of createSale.productos) {
       const product = await prisma.products.findUnique({
         where: { id: producto.id },

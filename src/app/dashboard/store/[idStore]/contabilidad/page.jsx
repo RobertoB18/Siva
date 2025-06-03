@@ -48,16 +48,16 @@ export default function contabilidad() {
         const data = await resp.json()
         setData(data)
         console.log(data)
-        toast.success("Facturas cargadas cargados", { id: toastId })
+        toast.success("Facturas cargadas", { id: toastId })
       } catch (error) {
-        toast.error("Error al cargar los proveedores", { id: toastId })
+        toast.error("Error al cargar las facturas", { id: toastId })
       }
     };
     productos()
   }, [access])  
 
   const filteredData = data.filter(factura =>{
-    return factura.clientes.name.toLowerCase().includes(search.toLowerCase())
+    return factura.clientes.razonSocial.toLowerCase().includes(search.toLowerCase())
   }
   );
 

@@ -6,7 +6,8 @@ export function useSale() {
 
     const [maxDescuento, setMaxDescuento] = useState(null) 
     const [store, setStore] = useState(null)
-    const [descuento, setDescuento] = useState(0)
+    const [descuento, setDescuento] = useState(null)
+
     const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
             const localStorageCart = localStorage.getItem("cart");
@@ -14,6 +15,12 @@ export function useSale() {
         }
         return [];
     });
+
+    useEffect(()=>{
+        if (typeof window !== "undefined") {
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+    }, [cart])
     
     useEffect(() => {
         if (store) {
@@ -134,19 +141,21 @@ export function useSale() {
     return subtotalConDescuento + iva;
     }, [subtotalConDescuento, iva]);
 
-    async function updateSale(storeId, clienteId, sale){
+    async function updateSale(data){
         try {
             const payload = {
-                storeId: Number(storeId),
-                cliente: clienteId,
+                storeId: Number(data.storeId),
+                cliente: Number(data.clienteId),
                 total: Number(totalCart),
                 productos: cart, 
                 subtotal: Number(subtotalConDescuento),
                 descuento: Number(descuento),
+                use: data.use, 
+                pago: data.pago
             }
 
             console.log(payload)
-            const response = await fetch("/api/sales/"+sale, {
+            const response = await fetch("/api/sales/"+data.sale, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -158,7 +167,7 @@ export function useSale() {
                 throw new Error("Error al actualizar la venta")
             }
             return {
-                success: true
+                success: true,
             }
         } catch (error) {
             console.log(error)
@@ -167,16 +176,19 @@ export function useSale() {
             }
         }
     }
-    async function finishSale(storeId, clienteId){
+    async function finishSale(data){
         try {
             const payload = {
-                storeId: Number(storeId),
-                cliente: clienteId,
+                storeId: Number(data.storeId),
+                cliente: data.clienteId,
                 total: Number(totalCart),
                 productos: cart,
                 subtotal: Number(subtotalConDescuento),
                 descuento: Number(descuento),
+                use: data.use, 
+                pago: data.pago
             }
+            console.log(payload)
 
             const response = await fetch("/api/sales", {
                 method: "POST",
@@ -189,9 +201,12 @@ export function useSale() {
             if (!response.ok) {
                 throw new Error("Error al crear la venta")
             }
+            const dataSale = await response.json()
+            console.log(dataSale);
 
             return {
-                success: true
+                success: true,
+                newSale: dataSale
             }
         } catch (error) {
             console.log(error)

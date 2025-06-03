@@ -14,7 +14,6 @@ export default function Ventas() {
   const { selectedStore } = useStore();
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
-  const [sale, setSale] = useState("");
   const [tipe, setTipe] = useState(false);
   const [access, setAccess] = useState(false)
 
@@ -49,9 +48,9 @@ export default function Ventas() {
         const data = await resp.json()
         setData(data)
         console.log(data)
-        toast.success("Productos cargados", { id: toastId })
+        toast.success("Ventas cargadas", { id: toastId })
       } catch (error) {
-        toast.error("Error al cargar los productos", { id: toastId })
+        toast.error("Error al cargar las ventas", { id: toastId })
       }
     };
     productos()

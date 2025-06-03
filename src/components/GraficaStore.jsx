@@ -1,19 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid} from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid
+} from 'recharts';
 
 export default function GraficaStore({ idStore }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`/api/grafica?idStore=`)
+    fetch(`/api/grafica?idStore=${idStore}`)
       .then((res) => res.json())
       .then(({ ventas, compras }) => {
         const agrupado = {};
 
         [...ventas, ...compras].forEach((item) => {
-          const fecha = item.date.split('T')[0];
+          const fechaUTC = new Date(item.date);
+          const fechaLocal = new Date(fechaUTC.getTime() - fechaUTC.getTimezoneOffset() * 60000);
+          const fecha = fechaLocal.toISOString().split('T')[0]; // formato YYYY-MM-DD local
 
           if (!agrupado[fecha]) {
             agrupado[fecha] = { fecha, ventas: 0, compras: 0 };
@@ -28,9 +38,17 @@ export default function GraficaStore({ idStore }) {
           }
         });
 
-        const resultado = Object.values(agrupado).sort((a, b) =>
-          a.fecha.localeCompare(b.fecha)
-        );
+        const hoy = new Date();
+        const hace7dias = new Date(hoy);
+        hace7dias.setDate(hoy.getDate() - 6); // Incluye hoy
+
+        const resultado = Object.values(agrupado)
+          .filter((item) => {
+            const fechaItem = new Date(item.fecha);
+            return fechaItem >= hace7dias && fechaItem <= hoy;
+          })
+          .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
         setData(resultado);
       });
   }, [idStore]);

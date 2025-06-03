@@ -18,6 +18,9 @@ model user{
   userName String @db.VarChar(512)
   email String @unique
   password String ?
+  loginAttempts  Int       @default(0)
+  blockedUntil   DateTime?
+  
   store StoreUser[]
 }
 
@@ -74,6 +77,8 @@ model Sale {
   subtotal Float @default(0)
   descuento Int? @default(0)
   total    Float
+  metodoPago String @default("01")
+  use String @default("G03")
   status Boolean @default(false)
   
   clientes clientes? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
@@ -101,8 +106,8 @@ model products{
   id Int @id @default(autoincrement())
   storeId Int
   name String
-  priceCost Int
-  priceMen Int
+  priceCost Float
+  priceMen Float
   stockMin Int
   stock Int
   unity String @map("unities")
@@ -111,7 +116,7 @@ model products{
   status Boolean
   codesat String
   unitsPerPackage Int? @default(0)
-  priceMay Int?
+  priceMay Float?
   mayQuantity Int?
   codeBar String? 
 

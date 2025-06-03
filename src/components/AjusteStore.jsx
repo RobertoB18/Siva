@@ -40,9 +40,12 @@ export default function AjusteStore() {
 
   const onSubmit = handleSubmit(async (data) => {
     const toastId = toast.loading("Creando negocio...");
-    if(data.descuento > 70 || data.descuento < 10){
-      toast.error("El descuento debe estar entre 10% y 70%", { id: toastId });
-      return;
+    if(data.descuento){
+      if(data.descuento > 70 || data.descuento < 10){
+        toast.error("El descuento debe estar entre 10% y 70%", { id: toastId });
+        return;
+      }
+      
     }
 
     let uploadedImageUrl = logo;
@@ -101,8 +104,8 @@ export default function AjusteStore() {
         <label htmlFor="phone">Telefono de la tienda</label>
         <input type="number" name="phone" id="phone" placeholder='Telefono de la tienda' className={`border rounded-md p-1 mb-4 ${errors.phone ? "border-red-400 border-2": "border-gray-500"}`} {...(register("phone", {required: true,} ))}/>
         
-        <label htmlFor="address">Direccion de la tienda</label>
-        <input type="text" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.address ? "border-red-400 border-2": "border-gray-500"}`} {...(register("address", {required: true,} ))}/>
+        <label htmlFor="address">Codigo Postal</label>
+        <input type="number" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.address ? "border-red-400 border-2": "border-gray-500"}`} {...(register("address", {required: true,} ))}/>
         
         <label htmlFor="address">% Descuento maximo permitido (10% - 70%)</label>
         <input type="number" name="address" id="address" placeholder='Direccion de la tienda' className={`border rounded-md p-1 mb-4 ${errors.descuento ? "border-red-400 border-2": "border-gray-500"}`} {...(register("descuento"))}/>

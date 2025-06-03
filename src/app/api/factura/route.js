@@ -1,5 +1,3 @@
-import { PassThrough } from "stream";
-import Facturapi from "facturapi";
 import { NextResponse } from "next/server";
 import { prisma } from "@/libs/prisma";
 
@@ -20,10 +18,10 @@ export async function GET(request, {params}) {
             clientes: {
               select: {
                 id: true,
-                name: true,
                 email: true,
                 phone: true,
-                rfc: true
+                rfc: true,
+                razonSocial: true,
               }
             }
           },

@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Sale" ADD COLUMN     "descuento" INTEGER DEFAULT 0,
-ADD COLUMN     "subtotal" DOUBLE PRECISION NOT NULL DEFAULT 0;

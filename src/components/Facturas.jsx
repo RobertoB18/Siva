@@ -1,5 +1,4 @@
 "use client"
-import { useRouter } from 'next/navigation'
 import Link from 'next/link';
 import { Edit } from 'lucide-react';
 
@@ -11,7 +10,7 @@ export default function WacthFacturas({factura}) {
     <tbody>
         <tr>
             <td className="border border-gray-300 px-4 py-2 ">{factura.clientes.rfc}</td>
-            <td className="border border-gray-300 px-4 py-2 ">{factura.clientes.name}</td>
+            <td className="border border-gray-300 px-4 py-2 ">{factura.clientes.razonSocial}</td>
             <td className="border border-gray-300 px-4 py-2">{factura.clientes.phone}</td>
             <td className="border border-gray-300 px-4 py-2">{factura.clientes.email}</td>
             <td className="border border-gray-300 px-4 py-2">{fechaLocal}</td>

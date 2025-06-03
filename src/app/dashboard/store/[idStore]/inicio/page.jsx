@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useStore } from "@/Context/newStoreContext";
 
+import dynamic from 'next/dynamic';
+const GraficaStore = dynamic(() => import('@/components/GraficaStore'), { ssr: false });
 
 export default function Cargando() {
-  const {selectStore } = useStore();
+  const {selectStore} = useStore();
   const {idStore} = useParams();
   const [store, setStore] = useState([]);
 
@@ -38,8 +40,8 @@ export default function Cargando() {
       <p className='text-2xl'>Telefono: {store.phone}</p>
       <p className='text-2xl'>Direccion: {store.address}</p>
       <p className='text-2xl'>Correo: {store.email}</p>
-      <p className='text-2xl'>logo</p>
       <img src={store.logo} alt="Vista previa" width="100" height="100" className="mb-2 rounded-full" />
+      <GraficaStore idStore={idStore} />
       <Toaster position="top-right" reverseOrder={false} />
     </div>
   )

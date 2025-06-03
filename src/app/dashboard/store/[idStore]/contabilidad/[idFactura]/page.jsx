@@ -65,7 +65,7 @@ export default function EfitarFactura() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <Link href="../ventas" onClick={exit} className=''>
+      <Link href="../contabilidad" className=''>
         <img src="/volver.png" width={30} height={30} alt="Regresar" />
       </Link>
         <div className="p-4 border rounded bg-gray-300">
