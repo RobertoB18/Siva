@@ -186,7 +186,8 @@ export function useSale() {
                 subtotal: Number(subtotalConDescuento),
                 descuento: Number(descuento),
                 use: data.use, 
-                pago: data.pago
+                pago: data.pago,
+                status: data.status ?? false
             }
             console.log(payload)
 

@@ -155,9 +155,13 @@ export function useSaleMay() {
             if (!response.ok) {
                 throw new Error("Error al crear la venta")
             }
+            const dataSale = await response.json()
+            console.log(dataSale);
 
             return {
-                success: true
+                success: true,
+                newSale: dataSale
+
             }
         } catch (error) {
             console.log(error)

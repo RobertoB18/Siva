@@ -15,15 +15,15 @@ export async function GET(request, {params}) {
                 storeId: Number(idStore),
             },
             include: {
-            clientes: {
-              select: {
-                id: true,
-                email: true,
-                phone: true,
-                rfc: true,
-                razonSocial: true,
+              clientes: {
+                select: {
+                  id: true,
+                  email: true,
+                  phone: true,
+                  rfc: true,
+                  razonSocial: true,
+                }
               }
-            }
           },
           orderBy: [
             { date: 'desc' } 

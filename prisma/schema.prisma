@@ -62,6 +62,7 @@ model facturas{
   storeId Int
   clienteId Int
   idFactura String
+  total Float?
   date DateTime @default(now())
 
   clientes clientes @relation(fields: [clienteId], references: [id], onDelete: Cascade)

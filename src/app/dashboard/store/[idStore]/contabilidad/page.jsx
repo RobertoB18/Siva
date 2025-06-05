@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react"
+import { generarPDF } from "@/app/Hooks/generatePdf";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,10 @@ export default function contabilidad() {
   const [data, setData] = useState([])
   const [search, setSearch] = useState("")
   const [access, setAccess] = useState(false)
+  const [document, setDocument] = useState(false)
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [reporte, setReporte] = useState();
 
   const { data: session, status } = useSession()
   const router = useRouter();
@@ -61,6 +66,26 @@ export default function contabilidad() {
   }
   );
 
+  const hacerReporte = async () => {
+    const toastId = toast.loading("Generando reporte...");
+    try {
+      if(!toDate || !fromDate) return toast.error("Seleccione las fechas para el reporte", {id: toastId})
+      
+      const res = await fetch(`/api/facturaReporte?idStore=${selectedStore}&from=${fromDate}&to=${toDate}`);
+      const data = await res.json();
+      
+      console.log(data);
+      generarPDF(data, fromDate, toDate);
+      
+      toast.success("Reporte generado", {id: toastId})
+    } catch (error) {
+      toast.error("Error al generar el reporte", {id: toastId})
+    }finally {
+      setDocument(false);
+    }
+
+  };
+
   if(access === false) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -75,6 +100,7 @@ export default function contabilidad() {
         <div className="mt-2 flex gap-2">
           <Link href="./clientes" className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">Ver Cliente</Link>
           <Link href="./contabilidad/newFactura" className="flex items-center justify-center bg-black text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-slate-600">+Nueva Factura</Link>
+          <button className="ms-56 p-2 flex items-center justify-center bg-green-600 text-white h-10 w-auto text-lg font-bold rounded-lg hover:bg-green-700" onClick={() => setDocument(true)}>Generar reporte financiero</button>
         </div>
       </div>
       <div className="h-screen w-3/4 flex flex-row ms-16 mt-5">
@@ -95,6 +121,55 @@ export default function contabilidad() {
           }
         </table>
       </div>
+      { document && (
+        <div>
+
+        </div>
+      )
+
+      }
+      {document && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" />
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
+              <h2 className="text-2xl font-bold mb-4 text-gray-800">Facturar</h2>
+              <p className="text-gray-600 mb-6">¿Deseas facturar la venta de una vez?</p>
+
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={hacerReporte}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md transition duration-200"
+                >
+                  Buscar
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
     </div>
   )
 }

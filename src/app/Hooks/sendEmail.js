@@ -1,23 +1,21 @@
 import emailjs from "emailjs-com";
 
+// utils/sendVerificationEmail.js o similar
+
 export const sendVerificationEmail = async (email, userName, code) => {
-    const templateParams = {
-        email: email,
-        codigoVerificacion: `${code}`,
-        userName: userName,
-    };
+  const response = await fetch("/api/userEmail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, userName, code }),
+  });
 
-    try {
-        const response = await emailjs.send(
-            "default_service",      // Reemplaza con tu SERVICE_ID
-            "template_bufnet8",     // Reemplaza con tu TEMPLATE_ID
-            templateParams,
-            "qzSyYelML3OgYPDik"  // Reemplaza con tu PUBLIC_KEY en EmailJS
-        );
-        return response;
-    } catch (error) {
-        console.error("Error enviando el correo: ", error);
-        throw error;
-    }
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "Error al enviar correo");
+  }
+
+  return result;
 };
-

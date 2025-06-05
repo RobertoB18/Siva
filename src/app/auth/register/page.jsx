@@ -21,16 +21,17 @@ export default function Page() {
     const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
     setVerificationCode(generatedCode);
     const realCode = generatedCode;
-
+    
     toast.promise(
       sendVerificationEmail(email, userName, realCode),
       {
         loading: "Enviando código, Esto puede tardar un poco...",
         success: "Código enviado exitosamente",
-        error: "Error al enviar el código. Intente de nuevo",
+        error: "Error al enviar el código. Intente de nuevo o verifique su correo",
       }
     ).then(() => {
       setIsCodeSent(true);
+      setRegisterError("");
     }).catch((error) => {
       console.error("Error enviando código:", error);
       setRegisterError("No se pudo enviar el código. Intente de nuevo.");
@@ -83,6 +84,7 @@ export default function Page() {
 
         <label htmlFor="email">Correo</label>
         <input 
+          disabled={isCodeSent}
           id="email" 
           type="text" 
           className={`border rounded-md p-2 mb-4 w-full text-black ${errors.email ? "border-red-400 border-4": "border-gray-500"}`} 

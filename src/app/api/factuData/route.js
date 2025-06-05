@@ -20,7 +20,7 @@ export async function POST(request, {params}){
   const venta = await request.json();
   const {clientes, productos} = venta;
   console.log(venta);
-
+  
   try {
     const storeData = await prisma.store.findUnique({
       where:{
@@ -54,11 +54,12 @@ export async function POST(request, {params}){
       series: 'F'
     })
 
-    await prisma.facturas.create({
+    const facturaData = await prisma.facturas.create({
       data:{
         storeId: venta.storeId,
         idFactura: factura.id,
-        clienteId: clientes.id
+        clienteId: clientes.id,
+        total: venta.total,
       }
     })
 
@@ -75,10 +76,10 @@ export async function POST(request, {params}){
       {email: clientes.email}
     )
 
-    return NextResponse.json({ message: 'Factura generada correctamente', factura });
+    return NextResponse.json({ message: 'Factura generada correctamente', facturaData });
   } catch (error) {
     console.log("Error: "+ error);
-    return NextResponse.json({ message: 'Factura generada correctamente', factura });
+    return NextResponse.json({ message: 'Error al generar la factura'});
   }
 
 }  

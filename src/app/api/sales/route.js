@@ -23,6 +23,14 @@ export async function GET(request) {
             }
           },
           include: {
+            store:{
+              select:{
+                name: true, 
+                phone: true,
+                email: true,
+                address: true
+              }
+            },
             clientes: true
           },
           orderBy: [
@@ -64,12 +72,13 @@ export async function POST(request) {
       data: {
         storeId: createSale.storeId,
         clienteId: createSale.cliente ?? null,
-        total: createSale.total,
         productos: createSale.productos,
         subtotal: createSale.subtotal,
-        descuento: createSale.descuento ? createSale.descuento : 0,
-        use: createSale.use ? createSale.use : "",
-        metodoPago: createSale.pago
+        descuento: createSale.descuento,
+        total: createSale.total,
+        use: createSale.use ?? "G03",
+        metodoPago: createSale.pago ?? "01",
+        status: createSale.status ?? false,
       },
       include: {
         clientes: true, // Esto incluye la información del cliente relacionado

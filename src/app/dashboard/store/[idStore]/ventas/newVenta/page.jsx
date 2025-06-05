@@ -119,8 +119,10 @@ export default function () {
       console.log(data);
       if (!res.ok) throw new Error(data.message || 'Error al facturar');
       toast.success("Facura generada y enviada a " + facturaData.clientes.email, {id: toastId})
+      return true
     } catch (error) {
       toast.error("No se pudo realizar la factura, Intente en otro momento", {id: toastId})
+      return false
     }
   }
 
@@ -315,6 +317,7 @@ export default function () {
 
             <label className="text-right font-bold" htmlFor="descuento">Descuento:</label>
             <input
+              disable={params.idVenta}
               id="descuento"
               className="border rounded-md w-20 px-2"
               type="number"
@@ -431,8 +434,9 @@ export default function () {
                     }
                     const success = await finishedSale();
                     if (success) {
-                      facturar()
-                      return router.push(`../ventas`);
+                      let succes = false;
+                      succes = facturar()
+                      if(!succes) return router.push(`../ventas`);
                     }
                     else setFactura(false)
                   }}
@@ -442,7 +446,11 @@ export default function () {
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
                   onClick={async () => {
-                    facturar()
+                    let succes = false;
+                    succes = facturar()
+                    if(succes){
+                      router.push("../ventas");
+                    }
                   }}
                 >
                   Reintentar
