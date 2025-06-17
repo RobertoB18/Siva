@@ -77,6 +77,11 @@ export const authOptions = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 5 * 60, // 5 minutos
+    updateAge: 60,
+  },
   callbacks: {
     async signIn({ user, account }) {
       if (account.provider === "google") {

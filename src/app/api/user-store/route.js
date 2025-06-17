@@ -27,6 +27,7 @@ export async function GET() {
                 id: true,
                 name: true,
                 logo: true,
+                phone: true,
               }                                                               
             }
           }

@@ -6,6 +6,8 @@ export function useSaleMay() {
     const [maxDescuento, setMaxDescuento] = useState(null) 
     const [store, setStore] = useState(null)
     const [descuento, setDescuento] = useState(0)
+    const [message, setMessage] = useState(true);
+
     const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
             const localStorageCart = localStorage.getItem("cart");
@@ -109,29 +111,36 @@ export function useSaleMay() {
         setCart([])
     }
     
-    // Subtotal sin IVA
+    
+    // 1. Subtotal sin IVA
     const subtotal = useMemo(() => {
     return cart.reduce((total, item) => total + (item.priceIva * item.quantity), 0);
     }, [cart]);
 
-    // Subtotal con descuento aplicado
-    const subtotalConDescuento = useMemo(() => {
-    const descuentoValido = descuento > maxDescuento ? 0 : descuento;
-    return subtotal - (subtotal * descuentoValido) / 100;
-    }, [subtotal, descuento, maxDescuento]);
-
-    // IVA (por ejemplo, 16%)
-    const tasaIva = 0.16; // Puedes cambiarlo si es diferente
-
-    // IVA calculado sobre subtotal con descuento
+    // 2. IVA calculado sobre el subtotal
+    const tasaIva = 0.16;
     const iva = useMemo(() => {
-    return subtotalConDescuento * tasaIva;
-    }, [subtotalConDescuento]);
+    return subtotal * tasaIva;
+    }, [subtotal]);
 
-    // Total final con IVA incluido
+    // 3. Total sin descuento: subtotal + IVA
+    const totalSinDescuento = useMemo(() => {
+    return subtotal + iva;
+    }, [subtotal, iva]);
+
+    // 4. Descuento aplicado al total con IVA
     const totalCart = useMemo(() => {
-    return subtotalConDescuento + iva;
-    }, [subtotalConDescuento, iva]);
+    let descuentoValido;
+    if(descuento > maxDescuento){
+        setMessage(false)
+        descuentoValido = 0
+    }
+    else{
+        setMessage(true);
+        descuentoValido = descuento;
+    }
+    return totalSinDescuento * (1 - descuentoValido / 100);
+    }, [totalSinDescuento, descuento, maxDescuento]);
 
     async function finishSale(storeId, clienteId){
         try {
@@ -185,7 +194,8 @@ export function useSaleMay() {
         addtoSale,
         finishSale,
         subtotal,
-        subtotalConDescuento,
+        message,
+        totalSinDescuento,
         iva,
         totalCart
     }

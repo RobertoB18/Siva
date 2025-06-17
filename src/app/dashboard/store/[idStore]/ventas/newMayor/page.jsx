@@ -10,7 +10,7 @@ import BarcodeScannerPage from '@/components/ScanCode'
 
 export default function () {
   const { selectedStore } = useStore();
-  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, finishSale, descuento, setDescuento, setStore, cart, subtotal, subtotalConDescuento, iva, totalCart} = useSaleMay()
+  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, finishSale, descuento, setDescuento, setStore, message, cart, subtotal, totalSinDescuento, iva, totalCart} = useSaleMay()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [Clients, setClients] = useState(null)
@@ -98,7 +98,14 @@ export default function () {
   const finishedSale = async () => {
     const toastId = toast.loading("Finalizando venta...")
     try {
-      if(cart.length === 0) return toast.error("No hay productos en el carrito", { id: toastId })
+      if(cart.length === 0){
+        toast.error("No hay productos en el carrito", { id: toastId })
+        return false;
+      } 
+      if(!paymentForm){
+        toast.error("Selecciona el metodo de pago", { id: toastId })
+        return false
+      }
       const clientId = clientSelected ? Number(clientSelected.id) : null
       const result = await finishSale(selectedStore, clientId)
     
@@ -231,6 +238,12 @@ export default function () {
             <p className="text-right">Subtotal:</p>
             <p className="text-left">${subtotal.toFixed(2)}</p>
 
+            <p className="text-right">IVA (16%):</p>
+            <p className="text-left">${iva.toFixed(2)}</p>
+
+            <p className="text-right">Total sin descuento:</p>
+            <p className="text-left">${totalSinDescuento.toFixed(2)}</p>
+            
             <label className="text-right font-bold" htmlFor="descuento">Descuento:</label>
             <input
               id="descuento"
@@ -240,14 +253,11 @@ export default function () {
               value={descuento}
               onChange={(e) => setDescuento(Number(e.target.value))}
             />
+            <p className="col-span-2 text-center text-red-600 text-sm mt-1">
+              {!message && "El descuento no se aplicó ya que supera el descuento permitido"}
+            </p>
 
-            <p className="text-right">Subtotal con descuento:</p>
-            <p className="text-left">${subtotalConDescuento.toFixed(2)}</p>
-
-            <p className="text-right">IVA (16%):</p>
-            <p className="text-left">${iva.toFixed(2)}</p>
-
-            <p className="text-right font-bold text-xl">Total con IVA:</p>
+            <p className="text-right font-bold text-xl">Total:</p>
             <p className="text-left font-bold text-xl">${totalCart.toFixed(2)}</p>
           </div>
         </div>

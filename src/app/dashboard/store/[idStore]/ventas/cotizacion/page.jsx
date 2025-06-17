@@ -4,17 +4,20 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useStore } from '@/Context/newStoreContext'
-import CodeBar from '@/components/CodeBar'
 import AsyncSelect from 'react-select/async'
 import { useSale } from '@/app/Hooks/useSale'
 
 export default function () {
   const { selectedStore } = useStore();
-  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, generatePdf, cart, iva, totalCart, subtotal, subtotalConDescuento, descuento, setDescuento} = useSale()
+  const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, generatePdf, cart, iva, totalCart, subtotal, totalSinDescuento, descuento, setDescuento, setStore} = useSale()
   const router = useRouter()
 
   const [showConfirm, setShowConfirm] = useState(false)
 
+  useEffect(() => {
+    setStore(selectedStore);
+  }, [selectedStore])
+  
   const options = (inputValue) => {
     if(!inputValue) return [];
     return fetch(`/api/searchProduct?q=${inputValue}&idStore=${selectedStore}`) // Cambia la URL según tu API
@@ -38,18 +41,18 @@ export default function () {
   }
 
   const eliminar = async () => {
-    const toastId = toast.loading("Eliminando venta...")
+    const toastId = toast.loading("Eliminando cotizacion...")
     try {
       clearCart()
-      toast.success("Venta eliminada", { id: toastId })
+      toast.success("Cotizacion eliminada", { id: toastId })
       router.push("../ventas")
     } catch (error) {
       console.log(error)
-      toast.error("Error al eliminar la venta", { id: toastId })
+      toast.error("Error al eliminar la cotizacion", { id: toastId })
     }
   }
 
-    const generadorPdf = async () => {
+  const generadorPdf = async () => {
     const toastId = toast.loading("Generando recibo...")
     try {
         if(cart.length === 0) {
@@ -126,30 +129,37 @@ export default function () {
               }
             </tbody>
           </table>
-           <div className="flex flex-col justify-end items-end w-full">
-              <div className='grid grid-cols-2 gap-2 mt-5 w-full max-w-sm'>              
+          <div className="flex flex-col justify-end items-end w-full">
+            <div className='grid grid-cols-2 gap-2 mt-5 w-full max-w-sm'>              
               <p className="text-right">Subtotal:</p>
               <p className="text-left">${subtotal.toFixed(2)}</p>
 
-              <label className="text-right font-bold" htmlFor="descuento">Descuento: </label>
-              <input id='descuento' className='"border rounded-md w-10 px-2' type="number" placeholder='10%' value={descuento} onChange={(e) => setDescuento(Number(e.target.value))} />
-            
-              <p className="text-right">Subtotal con descuento:</p>
-                <p className="text-left">${subtotalConDescuento.toFixed(2)}</p>
+              <p className="text-right">IVA (16%):</p>
+              <p className="text-left">${iva.toFixed(2)}</p>
 
-                <p className="text-right">IVA (16%):</p>
-                <p className="text-left">${iva.toFixed(2)}</p>
+              <p className="text-right">Total sin descuento:</p>
+              <p className="text-left">${totalSinDescuento.toFixed(2)}</p>
+              
+              <label className="text-right font-bold" htmlFor="descuento">Descuento:</label>
+              <input
+                id="descuento"
+                className="border rounded-md w-20 px-2"
+                type="number"
+                placeholder="10%"
+                value={descuento}
+                onChange={(e) => setDescuento(Number(e.target.value))}
+              />
 
-                <p className="text-right font-bold text-xl col-span-1">Total con IVA:</p>
-                <p className="text-left font-bold text-xl col-span-1">${totalCart.toFixed(2)}</p>
+              <p className="text-right font-bold text-xl">Total:</p>
+              <p className="text-left font-bold text-xl">${totalCart.toFixed(2)}</p>
 
             </div>
           </div>
         </div>
         
         <div className="flex justify-between px-5 mt-2 w-3/4">
-          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl" onClick={() => setShowConfirm(true)}>Finalizar Cotizacion</button> 
-          <button className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl' onClick={eliminar}>Eliminar Cotizacion</button>
+          <button className="bg-black hover:bg-slate-500 text-white rounded-xl w-auto h-auto text-2xl" onClick={() => setShowConfirm(true)}>Finalizar Cotizacion</button> 
+          <button className='bg-red-500 hover:bg-red-700 text-white rounded-xl w-auto h-auto text-2xl' onClick={eliminar}>Eliminar Cotizacion</button>
         </div>
         </div>
         {showConfirm && (

@@ -4,9 +4,10 @@ import autoTable from "jspdf-autotable";
 
 export function useSale() {
 
-    const [maxDescuento, setMaxDescuento] = useState(null) 
+    const [maxDescuento, setMaxDescuento] = useState(70) 
     const [store, setStore] = useState(null)
     const [descuento, setDescuento] = useState(null)
+    const [message, setMessage] = useState(true);
 
     const [cart, setCart] = useState(() => {
         if (typeof window !== "undefined") {
@@ -28,6 +29,7 @@ export function useSale() {
             .then((response) => response.json())
             .then((data) => {
             setMaxDescuento(data.descuento); // ✅ Guarda en el estado
+            console.log(data.descuento)
             })
             .catch((err) => {
             console.error("Error al obtener el descuento máximo:", err);
@@ -117,29 +119,35 @@ export function useSale() {
     }
 
 
-    // Subtotal sin IVA
+    // 1. Subtotal sin IVA
     const subtotal = useMemo(() => {
     return cart.reduce((total, item) => total + (item.priceIva * item.quantity), 0);
     }, [cart]);
 
-    // Subtotal con descuento aplicado
-    const subtotalConDescuento = useMemo(() => {
-    const descuentoValido = descuento > maxDescuento ? 0 : descuento;
-    return subtotal - (subtotal * descuentoValido) / 100;
-    }, [subtotal, descuento, maxDescuento]);
-
-    // IVA (por ejemplo, 16%)
-    const tasaIva = 0.16; // Puedes cambiarlo si es diferente
-
-    // IVA calculado sobre subtotal con descuento
+    // 2. IVA calculado sobre el subtotal
+    const tasaIva = 0.16;
     const iva = useMemo(() => {
-    return subtotalConDescuento * tasaIva;
-    }, [subtotalConDescuento]);
+    return subtotal * tasaIva;
+    }, [subtotal]);
 
-    // Total final con IVA incluido
+    // 3. Total sin descuento: subtotal + IVA
+    const totalSinDescuento = useMemo(() => {
+    return subtotal + iva;
+    }, [subtotal, iva]);
+
+    // 4. Descuento aplicado al total con IVA
     const totalCart = useMemo(() => {
-    return subtotalConDescuento + iva;
-    }, [subtotalConDescuento, iva]);
+    let descuentoValido;
+    if(descuento > maxDescuento){
+        setMessage(false)
+        descuentoValido = 0
+    }
+    else{
+        setMessage(true);
+        descuentoValido = descuento;
+    }
+    return totalSinDescuento * (1 - descuentoValido / 100);
+    }, [totalSinDescuento, descuento, maxDescuento]);
 
     async function updateSale(data){
         try {
@@ -148,7 +156,7 @@ export function useSale() {
                 cliente: Number(data.clienteId),
                 total: Number(totalCart),
                 productos: cart, 
-                subtotal: Number(subtotalConDescuento),
+                subtotal: Number(subtotal),
                 descuento: Number(descuento),
                 use: data.use, 
                 pago: data.pago
@@ -183,7 +191,7 @@ export function useSale() {
                 cliente: data.clienteId,
                 total: Number(totalCart),
                 productos: cart,
-                subtotal: Number(subtotalConDescuento),
+                subtotal: Number(subtotal),
                 descuento: Number(descuento),
                 use: data.use, 
                 pago: data.pago,
@@ -265,8 +273,8 @@ export function useSale() {
             const finalY = doc.lastAutoTable.finalY + 10;
             // --- Subtotal y total ---
             doc.setFontSize(12);
-            doc.text(`Subtotal: $${subtotalConDescuento.toFixed(2)}`, 140, finalY);
-            doc.text(`Descuento: ${descuento.toFixed(2)}%`, 140, finalY + 6);
+            doc.text(`Subtotal: $${totalSinDescuento.toFixed(2)}`, 140, finalY);
+            doc.text(`Descuento: ${descuento || "0"}%`, 140, finalY + 6);
             doc.text(`IVA: $${iva.toFixed(2)}`, 140, finalY + 12);
             doc.text(`Total: $${totalCart.toFixed(2)}`, 140, finalY + 18);
 
@@ -287,8 +295,9 @@ export function useSale() {
     return {
         cart,
         descuento,
-        subtotalConDescuento,
+        totalSinDescuento,
         iva,
+        message,
         setStore,
         setDescuento,
         setCart,

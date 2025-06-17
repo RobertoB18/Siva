@@ -12,10 +12,6 @@ export default function () {
   const { selectedStore } = useStore();
   const {clearCart, addtoSale, updateCartQuantity, removeFromCart, validateQuantity, finishSale, iva, descuento, subtotalConDescuento, setDescuento, setStore, subtotal,  totalConDescuento, cart, setCart, totalCart, updateSale} = useSale()
   const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
-  const [Clients, setClients] = useState(null)
-  const [clientSelected, setClientSelected] = useState(null)
-  const [valido, setValido] = useState(true)
   const [mode, setMode] = useState(false)
 
   const params = useParams();
@@ -43,19 +39,19 @@ export default function () {
   }
 
   const eliminar = async () => {
-    const toastId = toast.loading("Cancelando venta...")
+    const toastId = toast.loading("Cancelando perdida...")
     try {
       clearCart()
-      toast.success("Venta cancelada", { id: toastId })
+      toast.success("Perdida cancelada", { id: toastId })
       router.push("../ventas")
     } catch (error) {
       console.log(error)
-      toast.error("Error al cancelar la venta", { id: toastId })
+      toast.error("Error al cancelar la perdida", { id: toastId })
     }
   }
 
   const finishedSale = async () => {
-    const toastId = toast.loading("Finalizando venta...")
+    const toastId = toast.loading("Registrando perdida...")
     if(cart.length === 0){
       toast.error("No hay productos en el carrito", { id: toastId })
       return false;
@@ -70,13 +66,13 @@ export default function () {
 
     try {
         const result = await finishSale(payload)
-        if(!result.success) return toast.error("Error al finalizar la venta", { id: toastId });
-        toast.success("Venta finalizada", { id: toastId })
+        if(!result.success) return toast.error("Error al registrar la perdida", { id: toastId });
+        toast.success("Perdida añadida", { id: toastId })
         clearCart();
         router.push("../almacen");
     } catch (error) {
       console.log(error)
-      toast.error("Error al finalizar la venta", { id: toastId })
+      toast.error("Error al registrar la perdida", { id: toastId })
     } 
   }
 
@@ -91,7 +87,7 @@ export default function () {
     </Link>
 
     <div>
-      <h1 className="text-3xl font-bold">Nueva Venta</h1>
+      <h1 className="text-3xl font-bold">Registrar Perdida</h1>
 
       <div className="mt-5 flex flex-col">
         <button
@@ -165,16 +161,16 @@ export default function () {
         <div className="flex justify-between px-5 mt-2 w-3/4">
           <>
             <button
-              className="bg-black hover:bg-slate-500 text-white rounded-xl w-[200px] h-auto text-2xl"
+              className="bg-black hover:bg-slate-500 text-white rounded-xl w-auto h-auto text-2xl"
               onClick={finishedSale}
             >
-              Finalizar venta
+              Finalizar Desperdicio
             </button>
             <button
-              className="bg-red-500 hover:bg-red-700 text-white rounded-xl w-[200px] h-auto text-2xl"
+              className="bg-red-500 hover:bg-red-700 text-white rounded-xl w-auto h-auto text-2xl"
               onClick={eliminar}
             >
-              Cancelar Venta
+              Cancelar Desperdicios
             </button>
           </>
       </div>
